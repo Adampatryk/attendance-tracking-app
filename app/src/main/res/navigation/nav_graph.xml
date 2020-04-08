@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/lecureListFragment"
-        android:name="com.example.attendance.ui.lecturelist.LecureListFragment"
+        android:name="com.example.attendance.ui.lecturelist.LectureListFragment"
         android:label="lecure_list_fragment"
         tools:layout="@layout/lecure_list_fragment" />
 </navigation>

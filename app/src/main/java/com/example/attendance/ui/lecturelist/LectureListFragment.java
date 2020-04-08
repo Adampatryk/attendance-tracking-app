@@ -1,7 +1,7 @@
 package com.example.attendance.ui.lecturelist;
 
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
 
@@ -16,43 +16,35 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.attendance.R;
-import com.example.attendance.viewmodels.ViewModelProviderFactory;
+import com.example.attendance.models.LectureModel;
+public class LectureListFragment extends Fragment {
 
-import java.util.List;
-
-import javax.inject.Inject;
-
-public class LecureListFragment extends Fragment {
-
-    private static final String TAG = "LecureListFragment";
-
-    @Inject
-    ViewModelProviderFactory viewModelProviderFactory;
+    private static final String TAG = "LectureListFragment";
 
     private LectureViewModel viewModel;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
 
-    final LectureRecyclerViewAdapter adapter = new LectureRecyclerViewAdapter();
-
-    public static LecureListFragment newInstance() {
-        return new LecureListFragment();
-    }
+    final private LectureRecyclerViewAdapter adapter = new LectureRecyclerViewAdapter();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.lecure_list_fragment, container, false);
 
-        swipeRefreshLayout = v.findViewById(R.id.pull_to_refresh);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        adapter.setOnItemClickListener(new LectureRecyclerViewAdapter.OnItemClickListener() {
             @Override
-            public void onRefresh() {
-                viewModel.getLectures();
-                swipeRefreshLayout.setRefreshing(false);
+            public void onItemClick(LectureModel lectureModel) {
+                Toast.makeText(getContext(), "Lecture ID: " +  lectureModel.getId(), Toast.LENGTH_SHORT).show();
             }
+        });
+        swipeRefreshLayout = v.findViewById(R.id.pull_to_refresh);
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            viewModel.getLectures();
+            swipeRefreshLayout.setRefreshing(false);
         });
 
         recyclerView = v.findViewById(R.id.recycler_view_lecture_list);
@@ -69,20 +61,18 @@ public class LecureListFragment extends Fragment {
 
 
         //DEPRECATED - TOCHANGE
-        viewModel = ViewModelProviders.of(this, viewModelProviderFactory).get(LectureViewModel.class);
+        //viewModel = ViewModelProviders.of(this, viewModelProviderFactory).get(LectureViewModel.class);
+        viewModel = new ViewModelProvider(this).get(LectureViewModel.class);
         viewModel.getLectures();
 
         subscribeObservers();
     }
 
     public void subscribeObservers(){
-        viewModel.observeLectures().observe(getViewLifecycleOwner(), new Observer<List<LectureModel>>() {
-            @Override
-            public void onChanged(List<LectureModel> lectureModels) {
-                if (lectureModels != null){
-                    Log.d(TAG, "onChanged: lectures changed...");
-                    adapter.submitList(lectureModels);
-                }
+        viewModel.observeLectures().observe(getViewLifecycleOwner(), lectureModels -> {
+            if (lectureModels != null){
+                Log.d(TAG, "onChanged: lectures changed...");
+                adapter.submitList(lectureModels);
             }
         });
     }

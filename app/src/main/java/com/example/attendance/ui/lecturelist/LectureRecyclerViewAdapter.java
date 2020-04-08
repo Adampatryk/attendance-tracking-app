@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.attendance.R;
+import com.example.attendance.models.LectureModel;
 import com.google.android.material.textview.MaterialTextView;
 
 import androidx.annotation.NonNull;

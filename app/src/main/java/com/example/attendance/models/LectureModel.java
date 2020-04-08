@@ -1,4 +1,4 @@
-package com.example.attendance.ui.lecturelist;
+package com.example.attendance.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
