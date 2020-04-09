@@ -4,13 +4,11 @@ import com.example.attendance.models.LectureModel;
 
 import java.util.List;
 
-import javax.inject.Singleton;
 
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
 //Repository is created only once
-@Singleton
 public class LectureRepository {
 
     private static final String TAG = "LectureRepository";

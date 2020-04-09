@@ -55,10 +55,11 @@ dependencies {
 
     //Retrofit call object to observable
     implementation "com.squareup.retrofit2:adapter-rxjava2:2.5.0"
+    implementation "com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0"
 
     //RxJava
     implementation "io.reactivex.rxjava3:rxandroid:3.0.0"
-    implementation "io.reactivex.rxjava3:rxjava:3.0.0"
+    implementation "io.reactivex.rxjava3:rxjava:3.0.2"
 
     //Convert Observable to LiveData
     implementation "android.arch.lifecycle:reactivestreams:1.1.1"
@@ -66,11 +67,7 @@ dependencies {
     //Lifecycle and Livedata
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
 
-    //Dagger2
-    implementation "com.google.dagger:dagger:2.22"
-    annotationProcessor "com.google.dagger:dagger-compiler:2.22"
-    //Dagger Android
-    implementation "com.google.dagger:dagger-android:2.22"
-    implementation "com.google.dagger:dagger-android-support:2.22"
-    annotationProcessor "com.google.dagger:dagger-android-processor:2.22"
+    //okhttp
+    implementation "com.squareup.okhttp3:logging-interceptor:4.2.1"
+
 }

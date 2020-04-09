@@ -1,5 +1,6 @@
 package com.example.attendance.ui.lecturelist;
 
+import com.example.attendance.auth.SessionManager;
 import com.example.attendance.models.LectureModel;
 import com.example.attendance.network.WebServiceProvider;
 
@@ -9,7 +10,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.LiveDataReactiveStreams;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.ViewModel;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class LectureViewModel extends ViewModel {
     private static final String TAG = "LectureListViewModel";
@@ -37,7 +38,7 @@ public class LectureViewModel extends ViewModel {
     public void getLectures(){
 
         final LiveData<List<LectureModel>> source = LiveDataReactiveStreams.fromPublisher(
-                WebServiceProvider.getLectureApi().getLectureList("Token 8f448d13a46a86211e5ebdb5d335a87ab4d841d8")
+                WebServiceProvider.getLectureApi().getLectureList("Token " + SessionManager.getUser().getToken())
                         .subscribeOn(Schedulers.io())
         );
 

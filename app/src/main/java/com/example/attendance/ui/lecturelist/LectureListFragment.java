@@ -1,6 +1,5 @@
 package com.example.attendance.ui.lecturelist;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -8,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -16,9 +16,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.attendance.R;
+import com.example.attendance.auth.SessionManager;
 import com.example.attendance.models.LectureModel;
 public class LectureListFragment extends Fragment {
 
@@ -27,13 +29,14 @@ public class LectureListFragment extends Fragment {
     private LectureViewModel viewModel;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private Button btn_logout;
 
     final private LectureRecyclerViewAdapter adapter = new LectureRecyclerViewAdapter();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.lecure_list_fragment, container, false);
+        View v = inflater.inflate(R.layout.lecture_list_fragment, container, false);
 
         adapter.setOnItemClickListener(new LectureRecyclerViewAdapter.OnItemClickListener() {
             @Override
@@ -45,6 +48,12 @@ public class LectureListFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             viewModel.getLectures();
             swipeRefreshLayout.setRefreshing(false);
+        });
+
+        btn_logout = v.findViewById(R.id.btn_logout);
+        btn_logout.setOnClickListener(v1 -> {
+            Navigation.findNavController(v1).navigate(R.id.action_lectureListFragment_to_loginFragment);
+            SessionManager.logout();
         });
 
         recyclerView = v.findViewById(R.id.recycler_view_lecture_list);
@@ -75,5 +84,11 @@ public class LectureListFragment extends Fragment {
                 adapter.submitList(lectureModels);
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: LectureListFragment resumed");
     }
 }

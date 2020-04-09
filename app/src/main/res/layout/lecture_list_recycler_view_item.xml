@@ -11,6 +11,7 @@
         android:id="@+id/item_lbl_lecture_title"
         android:textSize="20sp"
         tools:text="Introduction to Computer Science"
-        android:padding="10sp"/>
+        android:padding="10sp"
+        android:background="@color/cardview_dark_background"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
