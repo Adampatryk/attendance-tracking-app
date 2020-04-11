@@ -23,6 +23,34 @@
         tools:layout="@layout/lecture_list_fragment" >
         <action
             android:id="@+id/action_lectureListFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            app:destination="@id/loginFragment"/>
+        <action
+            android:id="@+id/action_lectureListFragment_to_lectureDetailFragment"
+            app:destination="@id/lectureDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/lectureDetailFragment"
+        android:name="com.example.attendance.ui.lecturedetail.LectureDetailFragment"
+        android:label="lecture_detail_fragment"
+        tools:layout="@layout/lecture_detail_fragment" >
+        <action
+            android:id="@+id/action_lectureDetailFragment_to_scanFragment"
+            app:destination="@id/scanFragment" />
+        <argument
+            android:name="lecture_id"
+            app:argType="integer"
+            android:defaultValue="-1" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/scanFragment"
+        android:name="com.example.attendance.ui.scan.ScanFragment"
+        android:label="scan_fragment"
+        tools:layout="@layout/scan_fragment" >
+        <action
+            android:id="@+id/action_scanFragment_to_lectureDetailFragment"
+            app:destination="@id/lectureDetailFragment"
+            app:popUpTo="@id/scanFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

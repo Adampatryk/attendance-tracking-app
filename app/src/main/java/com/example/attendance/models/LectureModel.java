@@ -14,29 +14,42 @@ public class LectureModel {
     @Expose
     private String title;
 
-    @SerializedName("module_id")
+    @SerializedName("module")
     @Expose
-    private String module;
+    private ModuleModel module;
 
     @SerializedName("datetime")
     @Expose
     private Date date;
 
+    @SerializedName("secret")
+    private String secret;
+
     @Override
     public String toString() {
-        return "LectureListModel{" +
+        return "LectureModel{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
-                ", module='" + module + '\'' +
+                ", module=" + module +
                 ", date=" + date +
+                ", secret='" + secret + '\'' +
                 '}';
     }
 
-    public LectureModel(int id, String title, String module, Date date) {
+    public LectureModel(int id, String title, ModuleModel module, Date date, String secret) {
         this.id = id;
         this.title = title;
         this.module = module;
         this.date = date;
+        this.secret = secret;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
     }
 
     public String getTitle() {
@@ -47,11 +60,11 @@ public class LectureModel {
         this.title = title;
     }
 
-    public String getModule() {
+    public ModuleModel getModule() {
         return module;
     }
 
-    public void setModule(String module) {
+    public void setModule(ModuleModel module) {
         this.module = module;
     }
 

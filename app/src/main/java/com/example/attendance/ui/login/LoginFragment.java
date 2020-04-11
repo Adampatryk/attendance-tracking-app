@@ -72,6 +72,7 @@ public class LoginFragment extends Fragment {
 
         //If logged in, navigate to list of lectures
         if (SessionManager.isAuthenticated()) {
+            Toast.makeText(getContext(), "Already logged in", Toast.LENGTH_SHORT).show();
             Navigation.findNavController(getView()).navigate(R.id.action_loginFragment_to_lectureListFragment);
         }
 
@@ -84,9 +85,9 @@ public class LoginFragment extends Fragment {
         password = password_field.getEditText().getText().toString();
         password_field.getEditText().onEditorAction(EditorInfo.IME_ACTION_DONE);
 
-        if (!username.isEmpty() || !password.isEmpty()) {
+        if (!username.isEmpty() && !password.isEmpty()) {
             Log.d(TAG, "attemptLogin: Attempting login");
-            UserModel user = new UserModel(username, password, null, null);
+            UserModel user = new UserModel(-1, username, password, null, false, null);
             makeLoginRequest(user);
         }
         else {
@@ -95,8 +96,8 @@ public class LoginFragment extends Fragment {
         return false;
     }
 
-    public void makeLoginRequest(UserModel user){
-        WebServiceProvider.getAuthApi().authenticateUser(user)
+    public void makeLoginRequest(UserModel userRequest){
+        WebServiceProvider.getAuthApi().authenticateUser(userRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<UserModel>() {
@@ -108,13 +109,13 @@ public class LoginFragment extends Fragment {
                     }
 
                     @Override
-                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull UserModel userModel) {
-                        Log.d(TAG, "onNext: " + userModel.toString());
-                        user.setToken(userModel.getToken());
-                        if (SessionManager.login(user)){
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull UserModel userResponse) {
+                        Log.d(TAG, "onNext: " + userResponse.toString());
+                        if (SessionManager.login(userRequest, userResponse)){
                             Navigation.findNavController(getView()).navigate(R.id.action_loginFragment_to_lectureListFragment);
                         }
                         else {
+                            Toast.makeText(getContext(), "Something went wrong while validating", Toast.LENGTH_SHORT).show();
                         }
 
                         progressBar.setVisibility(View.GONE);

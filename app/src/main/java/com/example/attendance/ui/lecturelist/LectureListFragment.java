@@ -38,12 +38,14 @@ public class LectureListFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.lecture_list_fragment, container, false);
 
-        adapter.setOnItemClickListener(new LectureRecyclerViewAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(LectureModel lectureModel) {
-                Toast.makeText(getContext(), "Lecture ID: " +  lectureModel.getId(), Toast.LENGTH_SHORT).show();
-            }
+        adapter.setOnItemClickListener(lectureModel -> {
+            Toast.makeText(getContext(), "Lecture ID: " +  lectureModel.getId(), Toast.LENGTH_SHORT).show();
+
+            Bundle bundle = new Bundle();
+            bundle.putInt("lecture_id", lectureModel.getId());
+            Navigation.findNavController(v).navigate(R.id.action_lectureListFragment_to_lectureDetailFragment, bundle);
         });
+
         swipeRefreshLayout = v.findViewById(R.id.pull_to_refresh);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             viewModel.getLectures();
@@ -60,6 +62,8 @@ public class LectureListFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        Toast.makeText(getContext(), "Lecturer: " + SessionManager.getUser().isLecturer(), Toast.LENGTH_SHORT).show();
+
         return v;
     }
 
@@ -68,9 +72,6 @@ public class LectureListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         recyclerView.setAdapter(adapter);
 
-
-        //DEPRECATED - TOCHANGE
-        //viewModel = ViewModelProviders.of(this, viewModelProviderFactory).get(LectureViewModel.class);
         viewModel = new ViewModelProvider(this).get(LectureViewModel.class);
         viewModel.getLectures();
 

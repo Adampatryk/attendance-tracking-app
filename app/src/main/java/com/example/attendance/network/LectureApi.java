@@ -10,9 +10,9 @@ import retrofit2.http.Header;
 import retrofit2.http.Path;
 
 public interface LectureApi {
-    @GET("api/lectures/")
+    @GET("api/lectures/?denormalized=true")
     Flowable<List<LectureModel>> getLectureList(@Header("Authorization") String token);
 
-    @GET("api/lectures/{id}")
-    Flowable<LectureModel> getLecture(@Path(value = "id", encoded = true) String lectureId);
+    @GET("api/lectures/{id}?denormalized=true")
+    Flowable<LectureModel> getLecture(@Header("Authorization") String token, @Path(value = "id", encoded = true) int lectureId);
 }

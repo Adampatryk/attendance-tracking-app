@@ -13,8 +13,11 @@ public class SessionManager {
 
     public static boolean isAuthenticated(){
         if (user == null) return false;
-        if (user.getToken() == null) return false;
+        if (!user.hasToken()) return false;
         if (user.getAuthorisation_error() != null) return false;
+        if (user.getId() == -1) return false;
+
+        //TODO Make a request with the token to check if it is valid
         return true;
     }
 
@@ -22,19 +25,29 @@ public class SessionManager {
         return user;
     }
 
-    public static boolean login(UserModel user){
-        Log.d(TAG, "login: Logging user in" + user.toString());
-        SessionManager.user = user;
+    public static boolean login(UserModel userRequest, UserModel userResponse){
 
+        //Check if the users match
+        if (!userRequest.getUsername().equals(userResponse.getUsername())){
+            Log.d(TAG, "login: usernames don't match\n\nRequest username: " + userRequest.getUsername() + "\nResponse username: " + userResponse.getUsername());
+            return false;
+        }
+
+        SessionManager.user = userResponse;
+
+        Log.d(TAG, "login: Logging user in " + user.toString());
         if (sp != null) {
-            Log.d(TAG, "login: Logging in without shared preferences");
+
+            sp.edit().putInt("id", user.getId()).apply();
             sp.edit().putString("username", user.getUsername()).apply();
             sp.edit().putString("password", user.getPassword()).apply();
-            sp.edit().putString("token", user.getToken()).apply();
+            sp.edit().putBoolean("lecturer", user.isLecturer()).apply();
+            sp.edit().putString("token", user.getToken(false)).apply();
+        } {
+            Log.d(TAG, "login: Logging in without shared preferences");
         }
 
         return isAuthenticated();
-
     }
 
     public static boolean logout(){
@@ -42,8 +55,10 @@ public class SessionManager {
         SessionManager.user = null;
 
         if (sp != null) {
+            sp.edit().putInt("id", -1).apply();
             sp.edit().putString("username", null).apply();
             sp.edit().putString("password", null).apply();
+            sp.edit().putBoolean("lecturer", false).apply();
             sp.edit().putString("token", null).apply();
         }
         else {
@@ -59,9 +74,11 @@ public class SessionManager {
         SessionManager.sp = sp;
 
         SessionManager.user = new UserModel(
+                sp.getInt("id", -1),
                 sp.getString("username", null),
                 sp.getString("password", null),
                 sp.getString("token", null),
+                sp.getBoolean("lecturer", false),
                 null
         );
     }

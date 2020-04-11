@@ -52,23 +52,26 @@ public class LectureRecyclerViewAdapter extends ListAdapter<LectureModel, Lectur
 
         //Set the text of the item to the lecture details
         holder.txt_view_title.setText(currentLecture.getTitle());
+        holder.txt_view_module.setText(currentLecture.getModule().getTitle());
+        holder.txt_view_prof.setText(currentLecture.getModule().getProfessors()[0].getUsername());
     }
 
     class LectureListHolder extends RecyclerView.ViewHolder {
         private MaterialTextView txt_view_title;
+        private MaterialTextView txt_view_module;
+        private MaterialTextView txt_view_prof;
 
         public LectureListHolder(@NonNull View itemView){
             super(itemView);
             txt_view_title = itemView.findViewById(R.id.item_lbl_lecture_title);
+            txt_view_module = itemView.findViewById(R.id.item_lbl_lecture_module);
+            txt_view_prof = itemView.findViewById(R.id.item_lbl_lecture_prof);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    //Make sure the listener is implemented, and that the click is on a valid position
-                    if (listener != null && position!= RecyclerView.NO_POSITION){
-                        listener.onItemClick(getItem(position));
-                    }
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                //Make sure the listener is implemented, and that the click is on a valid position
+                if (listener != null && position!= RecyclerView.NO_POSITION){
+                    listener.onItemClick(getItem(position));
                 }
             });
         }
