@@ -12,25 +12,16 @@
         tools:layout="@layout/login_fragment" >
         <action
             android:id="@+id/action_loginFragment_to_lectureListFragment"
-            app:destination="@id/lectureListFragment"
+            app:destination="@id/tabFragment"
             app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true"/>
-    </fragment>
-    <fragment
-        android:id="@+id/lectureListFragment"
-        android:name="com.example.attendance.ui.lecturelist.LectureListFragment"
-        android:label="lecture_list_fragment"
-        tools:layout="@layout/lecture_list_fragment" >
+            app:popUpToInclusive="true" />
         <action
-            android:id="@+id/action_lectureListFragment_to_loginFragment"
-            app:destination="@id/loginFragment"/>
-        <action
-            android:id="@+id/action_lectureListFragment_to_lectureDetailFragment"
-            app:destination="@id/lectureDetailFragment" />
+            android:id="@+id/action_loginFragment_to_tabFragment"
+            app:destination="@id/tabFragment" />
     </fragment>
     <fragment
         android:id="@+id/lectureDetailFragment"
-        android:name="com.example.attendance.ui.lecturedetail.LectureDetailFragment"
+        android:name="com.example.attendance.ui.tabcontainer.lecture.lecturedetail.LectureDetailFragment"
         android:label="lecture_detail_fragment"
         tools:layout="@layout/lecture_detail_fragment" >
         <action
@@ -53,4 +44,24 @@
             app:popUpTo="@id/scanFragment"
             app:popUpToInclusive="true" />
     </fragment>
+    <fragment
+        android:id="@+id/tabFragment"
+        android:name="com.example.attendance.ui.tabcontainer.TabFragment"
+        android:label="tab_fragment"
+        tools:layout="@layout/tab_fragment" >
+        <action
+            android:id="@+id/action_tabFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_tabFragment_to_lectureDetailFragment"
+            app:destination="@id/lectureDetailFragment" />
+        <action
+            android:id="@+id/action_tabFragment_to_moduleDetailFragment"
+            app:destination="@id/moduleDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/moduleDetailFragment"
+        android:name="com.example.attendance.ui.tabcontainer.module.moduledetail.ModuleDetailFragment"
+        android:label="module_detail_fragment"
+        tools:layout="@layout/module_detail_fragment" />
 </navigation>

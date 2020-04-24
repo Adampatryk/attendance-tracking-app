@@ -1,7 +1,6 @@
-package com.example.attendance.ui.lecturedetail;
+package com.example.attendance.ui.tabcontainer.lecture.lecturedetail;
 
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import android.os.Bundle;
 
@@ -15,16 +14,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.attendance.R;
 import com.example.attendance.auth.SessionManager;
+import com.example.attendance.ui.tabcontainer.TabViewModel;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.Objects;
 
 public class LectureDetailFragment extends Fragment {
 	private static final String TAG = "LectureDetailFragment";
-	private LectureDetailViewModel viewModel;
+	private TabViewModel viewModel;
 	private MaterialTextView
 			txt_lecture_title,
 			txt_lecture_module,
@@ -49,31 +50,25 @@ public class LectureDetailFragment extends Fragment {
 			btn_scan.setVisibility(View.VISIBLE);
 		}
 
-
 		return v;
 	}
 
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		viewModel = new ViewModelProvider(requireActivity()).get(LectureDetailViewModel.class);
+		viewModel = new ViewModelProvider(requireActivity()).get(TabViewModel.class);
 
-		Bundle bundle = getArguments();
-		if (bundle != null && bundle.getInt("lecture)id") != -1) {
-			viewModel.getLecture(bundle.getInt("lecture_id"));
-		}
-		else {
-			Log.d(TAG, "onActivityCreated: Something went wrong getting the id of the lecture");
-			Objects.requireNonNull(getActivity()).onBackPressed();
-		}
 		subscribeObservers();
+		viewModel.getLecture();
 	}
 
 	public void subscribeObservers(){
 		viewModel.observeLecture().observe(getViewLifecycleOwner(), lectureModel -> {
+			Log.d(TAG, "subscribeObservers: Lecture Received");
 			txt_lecture_title.setText(lectureModel.getTitle());
 			txt_lecture_module.setText(lectureModel.getModule().getTitle());
 			txt_lecture_prof.setText(lectureModel.getModule().getProfessors()[0].getUsername());
 		});
 	}
+
 }

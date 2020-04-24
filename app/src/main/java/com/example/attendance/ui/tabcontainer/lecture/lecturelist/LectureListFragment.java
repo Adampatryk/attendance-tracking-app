@@ -1,4 +1,4 @@
-package com.example.attendance.ui.lecturelist;
+package com.example.attendance.ui.tabcontainer.lecture.lecturelist;
 
 import androidx.lifecycle.ViewModelProvider;
 
@@ -17,19 +17,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.attendance.R;
-import com.example.attendance.auth.SessionManager;
-import com.example.attendance.models.LectureModel;
+import com.example.attendance.ui.tabcontainer.TabViewModel;
+import com.example.attendance.util.Constants;
+
 public class LectureListFragment extends Fragment {
 
     private static final String TAG = "LectureListFragment";
 
-    private LectureViewModel viewModel;
+    private TabViewModel viewModel;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private Button btn_logout;
+    private TextView no_lectures_text_view;
 
     final private LectureRecyclerViewAdapter adapter = new LectureRecyclerViewAdapter();
 
@@ -38,52 +40,64 @@ public class LectureListFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.lecture_list_fragment, container, false);
 
+        viewModel = new ViewModelProvider(requireActivity()).get(TabViewModel.class);
+
+        //Set the onclick adapter to each recycler view item
         adapter.setOnItemClickListener(lectureModel -> {
             Toast.makeText(getContext(), "Lecture ID: " +  lectureModel.getId(), Toast.LENGTH_SHORT).show();
 
-            Bundle bundle = new Bundle();
-            bundle.putInt("lecture_id", lectureModel.getId());
-            Navigation.findNavController(v).navigate(R.id.action_lectureListFragment_to_lectureDetailFragment, bundle);
+            viewModel.setLecture(lectureModel.getId());
+            Navigation.findNavController(v).navigate(R.id.action_tabFragment_to_lectureDetailFragment);
         });
 
-        swipeRefreshLayout = v.findViewById(R.id.pull_to_refresh);
+        swipeRefreshLayout = v.findViewById(R.id.pull_to_refresh_lectures);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             viewModel.getLectures();
-            swipeRefreshLayout.setRefreshing(false);
         });
 
-        btn_logout = v.findViewById(R.id.btn_logout);
-        btn_logout.setOnClickListener(v1 -> {
-            Navigation.findNavController(v1).navigate(R.id.action_lectureListFragment_to_loginFragment);
-            SessionManager.logout();
-        });
+        subscribeObservers();
+        viewModel.getLectures();
+        Log.d(TAG, "onCreateView: called - refresh true");
+        swipeRefreshLayout.setRefreshing(true);
 
         recyclerView = v.findViewById(R.id.recycler_view_lecture_list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        Toast.makeText(getContext(), "Lecturer: " + SessionManager.getUser().isLecturer(), Toast.LENGTH_SHORT).show();
+        no_lectures_text_view = v.findViewById(R.id.no_lectures_text_view);
 
+        recyclerView.setAdapter(adapter);
         return v;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        recyclerView.setAdapter(adapter);
-
-        viewModel = new ViewModelProvider(this).get(LectureViewModel.class);
-        viewModel.getLectures();
-
-        subscribeObservers();
+        Log.d(TAG, "onActivityCreated: called");
     }
 
     public void subscribeObservers(){
-        viewModel.observeLectures().observe(getViewLifecycleOwner(), lectureModels -> {
+        Log.d(TAG, "subscribeObservers: called");
+        viewModel.observeLectures().observe(getViewLifecycleOwner(),  lectureModels -> {
+            Log.d(TAG, "subscribeObservers: observer notified");
+            
+            //Has the call been successful?
             if (lectureModels != null){
                 Log.d(TAG, "onChanged: lectures changed...");
                 adapter.submitList(lectureModels);
+                if(lectureModels.size() == 0) {
+                    Log.d(TAG, "subscribeObservers: no lectures for this user");
+                    no_lectures_text_view.setVisibility(View.VISIBLE);
+                } else {
+                    no_lectures_text_view.setVisibility(View.GONE);
+                }
+            } else {
+                Log.d(TAG, "subscribeObservers: lectureModels returned null");
+                Toast.makeText(getContext(), Constants.NETWORK_ERROR_MSG, Toast.LENGTH_SHORT).show();
             }
+            Log.d(TAG, "subscribeObservers: refresh false");
+            //Stop the refresh animation
+            swipeRefreshLayout.setRefreshing(false);
         });
     }
 

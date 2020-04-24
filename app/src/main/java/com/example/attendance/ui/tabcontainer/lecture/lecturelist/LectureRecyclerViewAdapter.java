@@ -1,4 +1,4 @@
-package com.example.attendance.ui.lecturelist;
+package com.example.attendance.ui.tabcontainer.lecture.lecturelist;
 
 import android.view.LayoutInflater;
 import android.view.View;

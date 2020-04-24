@@ -30,6 +30,7 @@ import com.example.attendance.auth.SessionManager;
 import com.example.attendance.models.UserModel;
 import com.example.attendance.network.WebServiceProvider;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.net.UnknownHostException;
@@ -112,7 +113,7 @@ public class LoginFragment extends Fragment {
                     public void onNext(@io.reactivex.rxjava3.annotations.NonNull UserModel userResponse) {
                         Log.d(TAG, "onNext: " + userResponse.toString());
                         if (SessionManager.login(userRequest, userResponse)){
-                            Navigation.findNavController(getView()).navigate(R.id.action_loginFragment_to_lectureListFragment);
+                            Navigation.findNavController(getView()).navigate(R.id.action_loginFragment_to_tabFragment);
                         }
                         else {
                             Toast.makeText(getContext(), "Something went wrong while validating", Toast.LENGTH_SHORT).show();
@@ -125,7 +126,13 @@ public class LoginFragment extends Fragment {
                     public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
                         Log.d(TAG, "onError: " + e.toString());
                         if (e instanceof HttpException){
-                            Toast.makeText(getContext(), "Invalid Credentials", Toast.LENGTH_SHORT).show();
+                            if (e.getMessage().equals("HTTP 404 Not Found")) {
+                                Toast.makeText(getContext(), "Cannot reach the server", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                Toast.makeText(getContext(), "Invalid Credentials", Toast.LENGTH_SHORT).show();
+                            }
+
                         }
                         else if (e instanceof UnknownHostException) {
                             Toast.makeText(getContext(), "Check your network connection", Toast.LENGTH_SHORT).show();

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.lecturedetail.LectureDetailFragment">
+    tools:context=".ui.tabcontainer.lecture.lecturedetail.LectureDetailFragment">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/lbl_lecture_title"

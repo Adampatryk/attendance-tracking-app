@@ -36,6 +36,9 @@ public class WebServiceProvider {
 		return getRetrofitInstance().create(LectureApi.class);
 	}
 
+	//Return API for modules
+	public static ModuleApi getModuleApi() {return getRetrofitInstance().create(ModuleApi.class);}
+
 	//Return API for authorization which can be used to make network requests
 	public static AuthApi getAuthApi(){
 		return getRetrofitInstance().create(AuthApi.class);

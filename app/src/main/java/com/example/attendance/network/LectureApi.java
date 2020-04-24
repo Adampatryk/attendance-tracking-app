@@ -1,15 +1,22 @@
 package com.example.attendance.network;
 
+import com.example.attendance.models.AttendanceModel;
 import com.example.attendance.models.LectureModel;
 
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Observable;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface LectureApi {
+    @POST("api/lectures/attendance/")
+    Observable<AttendanceModel> postAttendance(@Header("Authorization") String token, @Body AttendanceModel attendanceModel);
+
     @GET("api/lectures/?denormalized=true")
     Flowable<List<LectureModel>> getLectureList(@Header("Authorization") String token);
 

@@ -1,9 +1,8 @@
 package com.example.attendance.ui.scan;
 
 import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.Observer;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -26,8 +25,9 @@ import android.widget.Toast;
 
 import com.example.attendance.R;
 import com.example.attendance.auth.QrCodeGenerator;
-import com.example.attendance.ui.lecturedetail.LectureDetailViewModel;
-import com.example.attendance.util.Hasher;
+import com.example.attendance.models.AttendanceModel;
+import com.example.attendance.ui.tabcontainer.TabViewModel;
+import com.example.attendance.util.Constants;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -35,16 +35,17 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class ScanFragment extends Fragment {
 	private static final String TAG = "ScanFragment";
-	private LectureDetailViewModel viewModel;
+	private TabViewModel viewModel;
 	private BarcodeDetector barcodeDetector;
 	private CameraSource cameraSource;
 	private SurfaceView surfaceView;
 	private Handler barcodeHandler;
+	SurfaceHolder.Callback cameraCallback;
 
+	private int lecture_id;
 	private String secret = null;
 
 	@Override
@@ -60,40 +61,41 @@ public class ScanFragment extends Fragment {
 		cameraSource = new CameraSource.Builder(getContext(), barcodeDetector)
 				.setRequestedPreviewSize(640, 480).build();
 
-		surfaceView.setSecure(true);
-		surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+		//Camera Callback
+		cameraCallback = new SurfaceHolder.Callback() {
 			@Override
 			public void surfaceCreated(SurfaceHolder surfaceHolder) {
-
+				Log.d(TAG, "surfaceCreated: called");
 				//Check if camera permission is granted
-				if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+				if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
 					Toast.makeText(getContext(), "Permission to use camera not granted", Toast.LENGTH_SHORT).show();
-					return;
-				}
+					// Permission is not granted, ask for it
+					requestPermissions(new String[]{Manifest.permission.CAMERA},
+							Constants.PERMISSIONS_REQUEST_CAMERA);
 
-				//Try to start the camera
-				try {
-					cameraSource.start(surfaceHolder);
-				} catch (IOException e) {
-					e.printStackTrace();
+				} else {
+					Log.d(TAG, "surfaceCreated: Starting camera");
+					startCamera(surfaceHolder);
 				}
 			}
 
 			@Override
 			public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-
+				Log.d(TAG, "surfaceChanged: called");
 			}
 
 			@Override
 			public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
 				cameraSource.stop();
 			}
-		});
+		};
+
+		surfaceView.getHolder().addCallback(cameraCallback);
+		surfaceView.setSecure(true);
 
 		barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
 			@Override
 			public void release() {
-
 			}
 
 			@Override
@@ -111,34 +113,54 @@ public class ScanFragment extends Fragment {
 		});
 
 		barcodeHandler = new Handler();
+		viewModel = new ViewModelProvider(requireActivity()).get(TabViewModel.class);
 
-
-		viewModel = new ViewModelProvider(requireActivity()).get(LectureDetailViewModel.class);
-
-		viewModel.observeLecture().observe(getViewLifecycleOwner(), lectureModel -> {
+		//TODO Convert to an observable...
+		//Make sure the secret and lecture_id is up to date
+		viewModel.observeLecture().observeForever(lectureModel -> {
+			lecture_id = lectureModel.getId();
 			secret = lectureModel.getSecret();
-			Toast.makeText(getContext(), "secret: " + secret, Toast.LENGTH_SHORT).show();
 		});
 
 		return v;
 	}
 
-	public boolean handleBarcode(Barcode barcode){
 
+	private boolean handleBarcode(Barcode barcode){
 
-		//Toast.makeText(getContext(), "Generated QRCode: " + QrCodeGenerator.generateCodeFromSecret(secret) +
-		//		"\nScanned QRCode: " + barcode.displayValue, Toast.LENGTH_LONG).show();
-
-		//Toast.makeText(getContext(), "QRCode: " + barcode.displayValue, Toast.LENGTH_SHORT).show();
 
 		//Does the scanned QR code match what it should be based on the secret
 		boolean match = QrCodeGenerator.generateCodeFromSecret(secret).equals(barcode.displayValue);
 
 		//If it matches, tell the server and update viewmodel, otherwise tell the user the QR code is invalid
 		if (match) {
-			//TODO Post to the server that this student is at this lecture using viewmodel
-			getActivity().onBackPressed();
-			Snackbar.make(getView(), "You have been scanned in", Snackbar.LENGTH_SHORT);
+			AttendanceModel attendance = new AttendanceModel(lecture_id, secret, Constants.DEVICE_ID, null, false);
+
+			//What to do when the server responds after scanning QR code
+			viewModel.observeAttendance().observe(getViewLifecycleOwner(), attendanceModel -> {
+				if (attendanceModel != null){
+
+					if (attendanceModel.getLectureId() == -1){
+						Toast.makeText(getContext(), "Error: " + attendanceModel.getError(), Toast.LENGTH_SHORT).show();
+					} else {
+						//Server accepted
+						Toast.makeText(getContext(), "Accepted!: " + attendanceModel.toString(), Toast.LENGTH_SHORT).show();
+						Log.d(TAG, "onCreateView: Accepted!: " + attendanceModel.toString());
+					}
+					Log.d(TAG, "onActivityCreated: Lecture model: " + viewModel.observeAttendance().getValue());
+					getActivity().onBackPressed();
+				} else {
+					Log.d(TAG, "onCreateView: Response was null");
+				}
+				viewModel.observeAttendance().removeObservers(getViewLifecycleOwner());
+
+				Log.d(TAG, "OnResult: lecture observers? " + viewModel.observeAttendance().hasObservers());
+			});
+			viewModel.postAttendance(attendance);
+
+			cameraSource.stop();
+
+			Log.d(TAG, "handleBarcode: Posting attendance..." + attendance.toString());
 		}
 		return match;
 	}
@@ -149,4 +171,47 @@ public class ScanFragment extends Fragment {
 
 	}
 
+	private boolean startCamera(SurfaceHolder surfaceHolder){
+		//Try to start the camera
+		try {
+			cameraSource.start(surfaceHolder);
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode,
+										   String[] permissions, int[] grantResults) {
+		switch (requestCode) {
+			case Constants.PERMISSIONS_REQUEST_CAMERA: {
+				Log.d(TAG, "onRequestPermissionsResult: Callback");
+				// If request is cancelled, the result arrays are empty.
+				if (grantResults.length > 0
+						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					// permission was granted
+					Log.d(TAG, "onRequestPermissionsResult: Permission Granted");
+					startCamera(surfaceView.getHolder());
+				} else {
+					// permission denied
+					Log.d(TAG, "onRequestPermissionsResult: Permission Denied");
+					Toast.makeText(getContext(),
+							"You must enable the camera permission to scan yourself in",
+							Toast.LENGTH_SHORT).show();
+					Navigation.findNavController(getView()).navigate(R.id.action_scanFragment_to_lectureDetailFragment);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		Log.d(TAG, "onDestroyView: Cleaning up");
+		cameraSource.release();
+		viewModel.observeAttendance().removeObservers(getViewLifecycleOwner());
+		viewModel.observeLecture().removeObservers(getViewLifecycleOwner());
+	}
 }
