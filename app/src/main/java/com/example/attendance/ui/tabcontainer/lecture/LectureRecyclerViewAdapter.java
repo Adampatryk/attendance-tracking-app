@@ -1,12 +1,19 @@
-package com.example.attendance.ui.tabcontainer.lecture.lecturelist;
+package com.example.attendance.ui.tabcontainer.lecture;
 
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.attendance.R;
+import com.example.attendance.auth.SessionManager;
 import com.example.attendance.models.LectureModel;
 import com.google.android.material.textview.MaterialTextView;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
@@ -16,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class LectureRecyclerViewAdapter extends ListAdapter<LectureModel, LectureRecyclerViewAdapter.LectureListHolder> {
 
     private OnItemClickListener listener;
+    private static final String TAG = "LectureRecyclerViewAdap";
 
     public LectureRecyclerViewAdapter() {
         super(DIFF_CALLBACK);
@@ -31,9 +39,9 @@ public class LectureRecyclerViewAdapter extends ListAdapter<LectureModel, Lectur
         @Override
         public boolean areContentsTheSame(@NonNull LectureModel oldItem, @NonNull LectureModel newItem) {
 
-            return oldItem.getTitle().equals(newItem.getTitle());// &&
-                    //oldItem.getDate().equals(newItem.getDate()) &&
-                    //oldItem.getModule().equals(newItem.getModule());
+            return oldItem.getTitle().equals(newItem.getTitle()) &&
+                    oldItem.getDate().equals(newItem.getDate()) &&
+                    oldItem.isPresent() == newItem.isPresent();
         }
     };
 
@@ -50,22 +58,35 @@ public class LectureRecyclerViewAdapter extends ListAdapter<LectureModel, Lectur
         //Get the current lecture item
         LectureModel currentLecture = getItem(position);
 
+        //If the user is an authenticated student
+        if (SessionManager.isAuthenticated() && !SessionManager.getUser().isLecturer()){
+            if (currentLecture.isPresent() == 1){
+                holder.itemView.setBackgroundColor(Color.rgb(1, 50, 32));
+            }
+            else if (currentLecture.isPresent() == 0) {
+                holder.itemView.setBackgroundColor(Color.rgb(50, 8, 1));
+            }
+        }
+
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+        String time = formatter.format(currentLecture.getDate());
+
         //Set the text of the item to the lecture details
         holder.txt_view_title.setText(currentLecture.getTitle());
         holder.txt_view_module.setText(currentLecture.getModule().getTitle());
-        holder.txt_view_prof.setText(currentLecture.getModule().getProfessors()[0].getUsername());
+        holder.txt_view_time.setText(time);
     }
 
     class LectureListHolder extends RecyclerView.ViewHolder {
         private MaterialTextView txt_view_title;
         private MaterialTextView txt_view_module;
-        private MaterialTextView txt_view_prof;
+        private MaterialTextView txt_view_time;
 
         public LectureListHolder(@NonNull View itemView){
             super(itemView);
             txt_view_title = itemView.findViewById(R.id.item_lbl_lecture_title);
             txt_view_module = itemView.findViewById(R.id.item_lbl_lecture_module);
-            txt_view_prof = itemView.findViewById(R.id.item_lbl_lecture_prof);
+            txt_view_time = itemView.findViewById(R.id.item_lbl_time);
 
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();

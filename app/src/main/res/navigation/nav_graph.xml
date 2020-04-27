@@ -20,48 +20,50 @@
             app:destination="@id/tabFragment" />
     </fragment>
     <fragment
-        android:id="@+id/lectureDetailFragment"
-        android:name="com.example.attendance.ui.tabcontainer.lecture.lecturedetail.LectureDetailFragment"
-        android:label="lecture_detail_fragment"
-        tools:layout="@layout/lecture_detail_fragment" >
-        <action
-            android:id="@+id/action_lectureDetailFragment_to_scanFragment"
-            app:destination="@id/scanFragment" />
-        <argument
-            android:name="lecture_id"
-            app:argType="integer"
-            android:defaultValue="-1" />
-
-    </fragment>
-    <fragment
         android:id="@+id/scanFragment"
         android:name="com.example.attendance.ui.scan.ScanFragment"
         android:label="scan_fragment"
         tools:layout="@layout/scan_fragment" >
         <action
             android:id="@+id/action_scanFragment_to_lectureDetailFragment"
-            app:destination="@id/lectureDetailFragment"
+            app:destination="@id/lectureTabFragment"
             app:popUpTo="@id/scanFragment"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/tabFragment"
-        android:name="com.example.attendance.ui.tabcontainer.TabFragment"
+        android:name="com.example.attendance.ui.tabcontainer.LecturesModulesTabFragment"
         android:label="tab_fragment"
-        tools:layout="@layout/tab_fragment" >
+        tools:layout="@layout/lectures_modules_tab_fragment" >
         <action
             android:id="@+id/action_tabFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
         <action
-            android:id="@+id/action_tabFragment_to_lectureDetailFragment"
-            app:destination="@id/lectureDetailFragment" />
-        <action
             android:id="@+id/action_tabFragment_to_moduleDetailFragment"
             app:destination="@id/moduleDetailFragment" />
+        <action
+            android:id="@+id/action_tabFragment_to_createLectureFragment"
+            app:destination="@id/createLectureFragment" />
+        <action
+            android:id="@+id/action_tabFragment_to_lectureTabFragment"
+            app:destination="@id/lectureTabFragment" />
     </fragment>
     <fragment
         android:id="@+id/moduleDetailFragment"
-        android:name="com.example.attendance.ui.tabcontainer.module.moduledetail.ModuleDetailFragment"
+        android:name="com.example.attendance.ui.tabcontainer.module.ModuleDetailFragment"
         android:label="module_detail_fragment"
         tools:layout="@layout/module_detail_fragment" />
+    <fragment
+        android:id="@+id/createLectureFragment"
+        android:name="com.example.attendance.ui.tabcontainer.lecture.CreateLectureFragment"
+        android:label="fragment_create_lecture"
+        tools:layout="@layout/fragment_create_lecture" />
+    <fragment
+        android:id="@+id/lectureTabFragment"
+        android:name="com.example.attendance.ui.tabcontainer.lecture.LectureDetail.LectureTabFragment"
+        android:label="LectureTabFragment" >
+        <action
+            android:id="@+id/action_lectureTabFragment_to_scanFragment"
+            app:destination="@id/scanFragment" />
+    </fragment>
 </navigation>

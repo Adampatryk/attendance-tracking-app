@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.tabcontainer.lecture.lecturedetail.LectureDetailFragment">
+    tools:context=".ui.tabcontainer.lecture.LectureDetail.LectureDetailFragment">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/lbl_lecture_title"
@@ -94,17 +94,27 @@
         />
 
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/lecture_datetime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/lbl_lecture_datetime"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:textSize="25dp"
-        tools:text="8:00am, Tue 23 Mar"
-        android:id="@+id/lecture_datetime"
         android:layout_margin="8dp"
         android:textColor="@color/colorAccent"
-        />
+        android:textSize="25dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lbl_lecture_datetime"
+        tools:text="8:00am, Tue 23 Mar" />
+
+    <ImageView
+        android:id="@+id/lecture_qr_code"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lecture_datetime"
+        android:visibility="gone"/>
+
     <Button
         android:id="@+id/btn_scan"
         android:layout_width="match_parent"
@@ -114,5 +124,26 @@
         android:visibility="gone"
         android:textSize="20sp"
         android:padding="20dp"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/delete_lecture_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_margin="16dp"
+        android:foreground="@drawable/ic_delete_forever_black_24dp"
+        android:visibility="gone"
+        />
+
+    <ProgressBar
+        android:id="@+id/lecture_deleting_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

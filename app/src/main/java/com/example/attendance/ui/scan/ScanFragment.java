@@ -28,6 +28,7 @@ import com.example.attendance.auth.QrCodeGenerator;
 import com.example.attendance.models.AttendanceModel;
 import com.example.attendance.ui.tabcontainer.TabViewModel;
 import com.example.attendance.util.Constants;
+import com.example.attendance.util.DateTimeConversion;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -46,7 +47,6 @@ public class ScanFragment extends Fragment {
 	SurfaceHolder.Callback cameraCallback;
 
 	private int lecture_id;
-	private String secret = null;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -115,54 +115,87 @@ public class ScanFragment extends Fragment {
 		barcodeHandler = new Handler();
 		viewModel = new ViewModelProvider(requireActivity()).get(TabViewModel.class);
 
-		//TODO Convert to an observable...
 		//Make sure the secret and lecture_id is up to date
 		viewModel.observeLecture().observeForever(lectureModel -> {
 			lecture_id = lectureModel.getId();
-			secret = lectureModel.getSecret();
 		});
 
 		return v;
 	}
 
+	private void setupServerResponse(){
+		//What to do when the server responds
+		viewModel.observeAttendance().observe(getViewLifecycleOwner(), attendanceModel -> {
+			if (attendanceModel != null){
+				Log.d(TAG, "setupServerResponse: " + attendanceModel.toString());
+				if (attendanceModel.getLectureId() == -1){
+					Toast.makeText(getContext(), "Error: " + attendanceModel.getError(), Toast.LENGTH_SHORT).show();
+				} else {
+					//Server accepted
+					Toast.makeText(getContext(), "Accepted!: " + attendanceModel.toString(), Toast.LENGTH_SHORT).show();
+					Log.d(TAG, "setupServerResponse: Accepted!: " + attendanceModel.toString());
+				}
+				Log.d(TAG, "setupServerResponse: Lecture model: " + viewModel.observeAttendance().getValue());
+				getActivity().onBackPressed();
+			} else{
+				Toast.makeText(getContext(), "response was null", Toast.LENGTH_LONG).show();
+				Log.d(TAG, "setupServerResponse: response was null");
+			}
+			viewModel.observeAttendance().removeObservers(getViewLifecycleOwner());
+		});
+	}
 
 	private boolean handleBarcode(Barcode barcode){
 
+		long qrTimestamp = DateTimeConversion.millisToSec(System.currentTimeMillis()) / Constants.TIMESTAMP_VALID_FOR;
+		//Setup request model
+		AttendanceModel attendance = new AttendanceModel(lecture_id, barcode.displayValue, Constants.DEVICE_ID, qrTimestamp);
 
-		//Does the scanned QR code match what it should be based on the secret
-		boolean match = QrCodeGenerator.generateCodeFromSecret(secret).equals(barcode.displayValue);
 
-		//If it matches, tell the server and update viewmodel, otherwise tell the user the QR code is invalid
-		if (match) {
-			AttendanceModel attendance = new AttendanceModel(lecture_id, secret, Constants.DEVICE_ID, null, false);
+		//Ask the server if this is a valid code
+		setupServerResponse();
+		viewModel.postAttendance(attendance);
 
-			//What to do when the server responds after scanning QR code
-			viewModel.observeAttendance().observe(getViewLifecycleOwner(), attendanceModel -> {
-				if (attendanceModel != null){
+		//Stop the camera
+		cameraSource.stop();
 
-					if (attendanceModel.getLectureId() == -1){
-						Toast.makeText(getContext(), "Error: " + attendanceModel.getError(), Toast.LENGTH_SHORT).show();
-					} else {
-						//Server accepted
-						Toast.makeText(getContext(), "Accepted!: " + attendanceModel.toString(), Toast.LENGTH_SHORT).show();
-						Log.d(TAG, "onCreateView: Accepted!: " + attendanceModel.toString());
-					}
-					Log.d(TAG, "onActivityCreated: Lecture model: " + viewModel.observeAttendance().getValue());
-					getActivity().onBackPressed();
-				} else {
-					Log.d(TAG, "onCreateView: Response was null");
-				}
-				viewModel.observeAttendance().removeObservers(getViewLifecycleOwner());
+		//TODO: Show dialogue box with refresh
 
-				Log.d(TAG, "OnResult: lecture observers? " + viewModel.observeAttendance().hasObservers());
-			});
-			viewModel.postAttendance(attendance);
-
-			cameraSource.stop();
-
-			Log.d(TAG, "handleBarcode: Posting attendance..." + attendance.toString());
-		}
-		return match;
+//		//Does the scanned QR code match what it should be based on the secret
+//		boolean match = QrCodeGenerator.generateCodeFromSecret(secret).equals(barcode.displayValue);
+//
+//		//If it matches, tell the server and update viewmodel, otherwise tell the user the QR code is invalid
+//		if (match) {
+//			AttendanceModel attendance = new AttendanceModel(lecture_id, secret, Constants.DEVICE_ID, null, false);
+//
+//			//What to do when the server responds after scanning QR code
+//			viewModel.observeAttendance().observe(getViewLifecycleOwner(), attendanceModel -> {
+//				if (attendanceModel != null){
+//
+//					if (attendanceModel.getLectureId() == -1){
+//						Toast.makeText(getContext(), "Error: " + attendanceModel.getError(), Toast.LENGTH_SHORT).show();
+//					} else {
+//						//Server accepted
+//						Toast.makeText(getContext(), "Accepted!: " + attendanceModel.toString(), Toast.LENGTH_SHORT).show();
+//						Log.d(TAG, "onCreateView: Accepted!: " + attendanceModel.toString());
+//					}
+//					Log.d(TAG, "onActivityCreated: Lecture model: " + viewModel.observeAttendance().getValue());
+//					getActivity().onBackPressed();
+//				} else {
+//					Log.d(TAG, "onCreateView: Response was null");
+//				}
+//				viewModel.observeAttendance().removeObservers(getViewLifecycleOwner());
+//
+//				Log.d(TAG, "OnResult: lecture observers? " + viewModel.observeAttendance().hasObservers());
+//			});
+//			viewModel.postAttendance(attendance);
+//
+//			cameraSource.stop();
+//
+//			Log.d(TAG, "handleBarcode: Posting attendance..." + attendance.toString());
+//		}
+//		return match;
+		return true;
 	}
 
 	@Override

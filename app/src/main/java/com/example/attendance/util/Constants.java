@@ -3,7 +3,9 @@ package com.example.attendance.util;
 import android.os.Build;
 
 public class Constants {
-    public static final String BASE_URL = "https://ef8b95b6.ngrok.io";
+    public static final String BASE_URL = "https://9da2b614.ngrok.io";
+
+    public static final int TIMESTAMP_VALID_FOR = 3;
 
     public static final String NETWORK_ERROR_MSG = "Couldn't reach the server";
 

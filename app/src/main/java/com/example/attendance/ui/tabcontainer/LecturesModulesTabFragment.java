@@ -1,10 +1,8 @@
 package com.example.attendance.ui.tabcontainer;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import android.os.Bundle;
 
@@ -22,30 +20,24 @@ import android.widget.Button;
 
 import com.example.attendance.R;
 import com.example.attendance.auth.SessionManager;
-import com.example.attendance.ui.tabcontainer.lecture.lecturelist.LectureListFragment;
-import com.example.attendance.ui.tabcontainer.module.modulelist.ModuleListFragment;
+import com.example.attendance.ui.tabcontainer.lecture.LectureListFragment;
+import com.example.attendance.ui.tabcontainer.module.ModuleListFragment;
 import com.example.attendance.util.Constants;
 import com.google.android.material.tabs.TabLayout;
-
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TabFragment extends Fragment {
+public class LecturesModulesTabFragment extends Fragment {
 
-	private static final String TAG = "TabFragment";
+	private static final String TAG = "LecturesModulesTabFragm";
 
 	private TabViewModel viewModel;
-
-	public static TabFragment newInstance() {
-		return new TabFragment();
-	}
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
 							 @Nullable Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.tab_fragment, container, false);
+		View v = inflater.inflate(R.layout.lectures_modules_tab_fragment, container, false);
 
 		ViewPager viewPager = v.findViewById(R.id.viewpager);
 		setupViewPager(viewPager);
@@ -63,8 +55,6 @@ public class TabFragment extends Fragment {
 			viewModel.clearAll();
 		});
 
-		Toast.makeText(getContext(), Constants.DEVICE_ID, Toast.LENGTH_SHORT).show();
-		Log.d(TAG, "onCreateView: device_id: " + Constants.DEVICE_ID);
 
 		return v;
 	}
@@ -77,7 +67,7 @@ public class TabFragment extends Fragment {
 
 	public void setupViewPager(ViewPager viewPager) {
 		Adapter adapter = new Adapter(getChildFragmentManager());
-		adapter.addFragment(new LectureListFragment(), "Lectures");
+		adapter.addFragment(new LectureListFragment(), "Lectures Today");
 		adapter.addFragment(new ModuleListFragment(), "Modules");
 
 		viewPager.setAdapter(adapter);

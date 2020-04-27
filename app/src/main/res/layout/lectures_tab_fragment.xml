@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.tabcontainer.TabFragment">
+    tools:context=".ui.tabcontainer.lecture.LectureDetail.LectureTabFragment">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/tabbar"
+        android:id="@+id/lecture_details_tab_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent">
@@ -27,19 +27,8 @@
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/btn_logout"
-        app:layout_constraintTop_toBottomOf="@id/tabbar"/>
-
-    <Button
-        android:id="@+id/btn_logout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:text="logout"
-        android:textSize="17sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/viewpager" />
+        app:layout_constraintTop_toBottomOf="@id/lecture_details_tab_bar"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

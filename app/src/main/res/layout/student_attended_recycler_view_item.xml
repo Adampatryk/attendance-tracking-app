@@ -9,43 +9,31 @@
     android:padding="8dp">
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/item_lbl_lecture_title"
+        android:id="@+id/item_lbl_student_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:paddingHorizontal="20sp"
-        android:paddingTop="20sp"
         android:singleLine="true"
         android:textSize="20sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/item_lbl_time"
-        tools:text="Introduction to Computer Sciencentroduction to computer" />
+        app:layout_constraintRight_toLeftOf="@id/item_student_time"
+        tools:text="Adam Kulpa" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/item_lbl_time"
+        android:id="@+id/item_student_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:singleLine="true"
-        android:textSize="30sp"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/item_lbl_lecture_title"
+        app:layout_constraintStart_toEndOf="@+id/item_lbl_student_name"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="9:00" />
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/item_lbl_lecture_module"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:textColor="@color/colorAccent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/item_lbl_lecture_title"
-        tools:text="Web Development" />
-
-<!--    <com.google.android.material.textview.MaterialTextView-->
+    <!--    <com.google.android.material.textview.MaterialTextView-->
 <!--        android:id="@+id/item_lbl_lecture_prof"-->
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"-->

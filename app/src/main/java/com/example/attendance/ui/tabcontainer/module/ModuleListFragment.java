@@ -1,7 +1,6 @@
-package com.example.attendance.ui.tabcontainer.module.modulelist;
+package com.example.attendance.ui.tabcontainer.module;
 
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import android.os.Bundle;
 
@@ -22,7 +21,6 @@ import android.widget.Toast;
 
 import com.example.attendance.R;
 import com.example.attendance.ui.tabcontainer.TabViewModel;
-import com.example.attendance.ui.tabcontainer.lecture.lecturelist.LectureRecyclerViewAdapter;
 import com.example.attendance.util.Constants;
 
 public class ModuleListFragment extends Fragment {
@@ -45,6 +43,9 @@ public class ModuleListFragment extends Fragment {
 		adapter.setOnItemClickListener(moduleModel -> {
 			Toast.makeText(getContext(), "Module ID: " +  moduleModel.getId(), Toast.LENGTH_SHORT).show();
 
+			//Select the correct module in the viewmodel
+			viewModel.setModule(moduleModel.getId());
+
 			Navigation.findNavController(v).navigate(R.id.action_tabFragment_to_moduleDetailFragment);
 		});
 
@@ -61,14 +62,13 @@ public class ModuleListFragment extends Fragment {
 
 		recyclerView.setAdapter(adapter);
 
-
 		return v;
 	}
 
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		viewModel = new ViewModelProvider(this).get(TabViewModel.class);
+		viewModel = new ViewModelProvider(requireActivity()).get(TabViewModel.class);
 		subscribeObservers();
 		viewModel.getModules();
 		swipeRefreshLayout.setRefreshing(true);

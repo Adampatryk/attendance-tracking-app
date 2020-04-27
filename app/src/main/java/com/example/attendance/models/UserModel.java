@@ -16,6 +16,14 @@ public class UserModel {
     @Expose
     private String username;
 
+    @SerializedName("first_name")
+    @Expose
+    private String firstName;
+
+    @SerializedName("last_name")
+    @Expose
+    private String lastName;
+
     @SerializedName("password")
     @Expose
     private String password;
@@ -75,6 +83,46 @@ public class UserModel {
 
     public void setToken(String token){
         this.token = token;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setLecturer(boolean lecturer) {
+        isLecturer = lecturer;
+    }
+
+    public void setAuthorisation_error(String authorisation_error) {
+        this.authorisation_error = authorisation_error;
     }
 
     @Override

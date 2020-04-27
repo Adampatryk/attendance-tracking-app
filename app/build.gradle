@@ -73,6 +73,9 @@ dependencies {
     //QR Scanner
     implementation 'com.google.android.gms:play-services-vision:20.0.0'
 
+    //QR Generator
+    implementation 'androidmads.library.qrgenearator:QRGenearator:1.0.3'
+
     //multidex
     implementation 'com.android.support:multidex:1.0.3'
 }

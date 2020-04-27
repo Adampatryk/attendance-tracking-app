@@ -1,11 +1,10 @@
-package com.example.attendance.ui.tabcontainer.module.modulelist;
+package com.example.attendance.ui.tabcontainer.module;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.attendance.R;
-import com.example.attendance.models.LectureModel;
 import com.example.attendance.models.ModuleModel;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -54,19 +53,31 @@ public class ModuleRecyclerViewAdapter extends ListAdapter<ModuleModel, ModuleRe
 		//Set the text of the item to the module details
 		holder.txt_view_title.setText(currentModule.getTitle());
 		holder.txt_view_module.setText(currentModule.getModuleCode());
-		holder.txt_view_prof.setText("currentModule.getProfessors()[0].getUsername()");
+//
+//		String teachers = "";
+//
+//		if (currentModule.getProfessors().length > 0){
+//			teachers += currentModule.getProfessors()[0].getUsername();
+//			int i = 1;
+//
+//			while (i < currentModule.getProfessors().length - 1){
+//				teachers += currentModule.getProfessors()[i].getUsername();
+//			}
+//		}
+
+		//holder.txt_view_prof.setText(teachers);
 	}
 
 	class ModuleListHolder extends RecyclerView.ViewHolder {
 		private MaterialTextView txt_view_title;
 		private MaterialTextView txt_view_module;
-		private MaterialTextView txt_view_prof;
+		//private MaterialTextView txt_view_prof;
 
 		public ModuleListHolder(@NonNull View itemView){
 			super(itemView);
 			txt_view_title = itemView.findViewById(R.id.item_lbl_lecture_title);
 			txt_view_module = itemView.findViewById(R.id.item_lbl_lecture_module);
-			txt_view_prof = itemView.findViewById(R.id.item_lbl_lecture_prof);
+			//txt_view_prof = itemView.findViewById(R.id.item_lbl_lecture_prof);
 
 			itemView.setOnClickListener(v -> {
 				int position = getAdapterPosition();

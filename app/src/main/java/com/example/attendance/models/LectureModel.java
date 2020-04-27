@@ -25,6 +25,10 @@ public class LectureModel {
     @SerializedName("secret")
     private String secret;
 
+    @SerializedName("present")
+    @Expose(serialize = false)
+    private int present = -1;
+
     @Override
     public String toString() {
         return "LectureModel{" +
@@ -33,7 +37,17 @@ public class LectureModel {
                 ", module=" + module +
                 ", date=" + date +
                 ", secret='" + secret + '\'' +
+                ", present=" + present +
                 '}';
+    }
+
+    public LectureModel(int id, String title, ModuleModel module, Date date, String secret, int present) {
+        this.id = id;
+        this.title = title;
+        this.module = module;
+        this.date = date;
+        this.secret = secret;
+        this.present = present;
     }
 
     public LectureModel(int id, String title, ModuleModel module, Date date, String secret) {
@@ -82,5 +96,13 @@ public class LectureModel {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int isPresent() {
+        return present;
+    }
+
+    public void setPresent(int present) {
+        this.present = present;
     }
 }
