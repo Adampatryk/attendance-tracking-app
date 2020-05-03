@@ -9,7 +9,7 @@ public class CreateLectureModel {
 	@Expose
 	private String title;
 
-	@SerializedName("module")
+	@SerializedName("module_id")
 	@Expose
 	private int moduleId;
 
@@ -17,10 +17,30 @@ public class CreateLectureModel {
 	@Expose
 	private String date;
 
+	@SerializedName("info")
+	@Expose
+	private String info;
+
+
 	public CreateLectureModel(String title, int moduleId, String date) {
 		this.title = title;
 		this.moduleId = moduleId;
 		this.date = date;
+	}
+
+	public CreateLectureModel(String title, int moduleId, String date, String info) {
+		this.title = title;
+		this.moduleId = moduleId;
+		this.date = date;
+		this.info = info;
+	}
+
+	public String getInfo() {
+		return info;
+	}
+
+	public void setInfo(String info) {
+		this.info = info;
 	}
 
 	public String getTitle() {

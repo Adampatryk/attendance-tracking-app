@@ -9,7 +9,7 @@ public class DeleteLectureModel {
 	@Expose
 	private int id;
 
-	@SerializedName("module")
+	@SerializedName("module_id")
 	@Expose
 	private int moduleId;
 

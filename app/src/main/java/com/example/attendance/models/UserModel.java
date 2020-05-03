@@ -36,11 +36,23 @@ public class UserModel {
     @Expose(serialize = false)
     private boolean isLecturer;
 
+    @SerializedName("attendance_for_module")
+    @Expose
+    private float attendanceForModule;
+
     @SerializedName("non_field_errors")
     @Expose(serialize = false)
     private String authorisation_error = null;
 
-    //TODO constructor overloading
+    public UserModel(int id, String username, String firstName, String lastName, boolean isLecturer, long attendanceForModule) {
+        this.id = id;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.isLecturer = isLecturer;
+        this.attendanceForModule = attendanceForModule;
+    }
+
     public UserModel(int id, String username, String password, String token, boolean isLecturer, String authorisation_error) {
         this.id = id;
         this.username = username;
@@ -50,7 +62,17 @@ public class UserModel {
         this.authorisation_error = authorisation_error;
     }
 
-    public int getId() {
+	public UserModel(int id, String username, String password, String first_name, String last_name, String token, boolean lecturer) {
+        this.id = id;
+        this.username = username;
+        this.firstName = first_name;
+        this.lastName = last_name;
+        this.isLecturer = lecturer;
+        this.password = password;
+        this.token = token;
+	}
+
+	public int getId() {
         return id;
     }
 
@@ -71,6 +93,14 @@ public class UserModel {
             return "Token " + token;
         } else
             return token;
+    }
+
+    public float getAttendanceForModule() {
+        return attendanceForModule;
+    }
+
+    public void setAttendanceForModule(float attendanceForModule) {
+        this.attendanceForModule = attendanceForModule;
     }
 
     public boolean hasToken(){

@@ -38,6 +38,9 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:1.1.1"
     androidTestImplementation "androidx.test.espresso:espresso-core:3.2.0"
 
+    //Splash screen
+    implementation 'gr.pantrif:easy-android-splash-screen:0.0.1'
+
     //Swipe refresh layout
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 

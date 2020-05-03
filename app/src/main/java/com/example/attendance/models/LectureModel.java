@@ -18,6 +18,10 @@ public class LectureModel {
     @Expose
     private ModuleModel module;
 
+    @SerializedName("module_id")
+    @Expose
+    private int moduleId = -1;
+
     @SerializedName("datetime")
     @Expose
     private Date date;
@@ -28,6 +32,10 @@ public class LectureModel {
     @SerializedName("present")
     @Expose(serialize = false)
     private int present = -1;
+
+    @SerializedName("info")
+    @Expose
+    private String info;
 
     @Override
     public String toString() {
@@ -56,6 +64,48 @@ public class LectureModel {
         this.module = module;
         this.date = date;
         this.secret = secret;
+    }
+
+    public LectureModel(int id, String title, int module, Date date, String secret) {
+        this.id = id;
+        this.title = title;
+        this.moduleId = module;
+        this.date = date;
+        this.secret = secret;
+    }
+
+    public LectureModel(int id, String title, ModuleModel module, String info, Date date, String secret) {
+        this.id = id;
+        this.title = title;
+        this.module = module;
+        this.info = info;
+        this.date = date;
+        this.secret = secret;
+    }
+
+
+    public int getModuleId() {
+        if (moduleId <= 0) {
+            return module.getId();
+        } else {
+            return moduleId;
+        }
+    }
+
+    public void setModuleId(int moduleId) {
+        this.moduleId = moduleId;
+    }
+
+    public int getPresent() {
+        return present;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
     }
 
     public String getSecret() {

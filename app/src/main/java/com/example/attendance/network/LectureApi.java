@@ -22,7 +22,7 @@ public interface LectureApi {
     @GET("api/lectures/{id}/attendance/")
     Observable<List<AttendanceModel>> getLectureAttendance(@Header("Authorization") String token, @Path("id") int lecture_id);
 
-    @POST("api/lectures/")
+    @POST("api/lectures/create/")
     Observable<LectureModel> createLecture(@Header("Authorization") String token, @Body CreateLectureModel lectureToCreate);
 
     @POST("api/lectures/delete/")
@@ -32,9 +32,13 @@ public interface LectureApi {
     Observable<List<LectureModel>> getLectureList(@Header("Authorization") String token);
 
     @GET("api/lectures/?denormalized=true")
-    Observable<List<LectureModel>> getLecturesForDate(@Header("Authorization") String token, @Query(value="date") String datetime);
+    Observable<List<LectureModel>> getLecturesForModule(@Header("Authorization") String token, @Query(value="module") int module_id);
+
+    @GET("api/lectures/modules/{module_id}/students/{student_id}/lectures/")
+    Observable<List<LectureModel>> getLecturesForModuleWithStudentsAttendance(@Header("Authorization") String token, @Path("module_id") int module_id, @Path("student_id") int student_id);
 
     @GET("api/lectures/?denormalized=true")
-    Observable<List<LectureModel>> getLecturesForModule(@Header("Authorization") String token, @Query(value="module") int moduleId);
+    Observable<List<LectureModel>> getLecturesForDate(@Header("Authorization") String token, @Query(value="date") String datetime);
+
 
 }

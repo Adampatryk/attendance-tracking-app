@@ -40,6 +40,8 @@ public class SessionManager {
 
             sp.edit().putInt("id", user.getId()).apply();
             sp.edit().putString("username", user.getUsername()).apply();
+            sp.edit().putString("first_name", user.getFirstName()).apply();
+            sp.edit().putString("last_name", user.getLastName()).apply();
             sp.edit().putString("password", user.getPassword()).apply();
             sp.edit().putBoolean("lecturer", user.isLecturer()).apply();
             sp.edit().putString("token", user.getToken(false)).apply();
@@ -58,6 +60,8 @@ public class SessionManager {
             sp.edit().putInt("id", -1).apply();
             sp.edit().putString("username", null).apply();
             sp.edit().putString("password", null).apply();
+            sp.edit().putString("first_name", null).apply();
+            sp.edit().putString("last_name", null).apply();
             sp.edit().putBoolean("lecturer", false).apply();
             sp.edit().putString("token", null).apply();
         }
@@ -77,13 +81,18 @@ public class SessionManager {
                 sp.getInt("id", -1),
                 sp.getString("username", null),
                 sp.getString("password", null),
+                sp.getString("first_name", null),
+                sp.getString("last_name", null),
                 sp.getString("token", null),
-                sp.getBoolean("lecturer", false),
-                null
+                sp.getBoolean("lecturer", false)
         );
     }
 
     public static boolean hasSharedPreferences(){
         return sp != null;
     }
+
+	public static String getLoggedInAs() {
+        return "Logged in as " + user.getFirstName() + " (" + user.getUsername() + ")";
+	}
 }

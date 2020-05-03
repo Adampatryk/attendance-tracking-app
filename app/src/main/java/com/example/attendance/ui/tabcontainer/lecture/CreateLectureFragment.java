@@ -23,7 +23,7 @@ import android.widget.Toast;
 import com.example.attendance.R;
 import com.example.attendance.models.CreateLectureModel;
 import com.example.attendance.models.ModuleModel;
-import com.example.attendance.ui.tabcontainer.TabViewModel;
+import com.example.attendance.ui.tabcontainer.AppViewModel;
 import com.example.attendance.util.DatePickerFragment;
 import com.example.attendance.util.DateUtils;
 import com.example.attendance.util.TimePickerFragment;
@@ -39,10 +39,10 @@ public class CreateLectureFragment extends Fragment implements TimePickerFragmen
 
 	private static final String TAG = "CreateLectureFragment";
 	private AutoCompleteTextView moduleDropDown;
-	private TabViewModel viewModel;
+	private AppViewModel viewModel;
 	private int selectedModuleId = -1;
-	private TextInputEditText titleTextView, timeTextView, dateTextView;
-	private TextInputLayout titleInputLayout, moduleInputLayout, timeInputLayout, dateInputLayout;
+	private TextInputEditText titleTextView, timeTextView, dateTextView, infoTextView;
+	private TextInputLayout titleInputLayout, moduleInputLayout, timeInputLayout, dateInputLayout, infoInputLayout;
 	private Button createLectureButton;
 	private ProgressBar creatingLectureProgress;
 	private String formattedDate, formattedTime;
@@ -54,7 +54,7 @@ public class CreateLectureFragment extends Fragment implements TimePickerFragmen
 		// Inflate the layout for this fragment
 		View v = inflater.inflate(R.layout.fragment_create_lecture, container, false);
 
-		viewModel = new ViewModelProvider(requireActivity()).get(TabViewModel.class);
+		viewModel = new ViewModelProvider(requireActivity()).get(AppViewModel.class);
 
 		findViews(v);
 		setupViews();
@@ -78,6 +78,8 @@ public class CreateLectureFragment extends Fragment implements TimePickerFragmen
 		dateTextView = v.findViewById(R.id.create_lecture_date_value);
 		createLectureButton = v.findViewById(R.id.create_lecture_button);
 		creatingLectureProgress = v.findViewById(R.id.creaing_lecture_progress);
+		infoTextView = v.findViewById(R.id.create_lecture_info_value);
+		infoInputLayout = v.findViewById(R.id.create_lecture_info_layout);
 	}
 
 	public void setupViews(){
@@ -125,8 +127,8 @@ public class CreateLectureFragment extends Fragment implements TimePickerFragmen
 
 			CreateLectureModel lectureToCreate = new CreateLectureModel(titleTextView.getText().toString(),
 																	selectedModuleId,
-																	datetime);//Format needs to be YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z]
-
+																	datetime,//Format needs to be YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z]
+																	infoTextView.getText().toString());
 
 			viewModel.createLecture(lectureToCreate);
 			creatingLectureProgress.setVisibility(View.VISIBLE);

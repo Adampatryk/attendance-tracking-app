@@ -14,45 +14,58 @@
             android:id="@+id/action_loginFragment_to_lectureListFragment"
             app:destination="@id/tabFragment"
             app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
         <action
             android:id="@+id/action_loginFragment_to_tabFragment"
-            app:destination="@id/tabFragment" />
+            app:destination="@id/tabFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
     <fragment
         android:id="@+id/scanFragment"
         android:name="com.example.attendance.ui.scan.ScanFragment"
         android:label="scan_fragment"
-        tools:layout="@layout/scan_fragment" >
-        <action
-            android:id="@+id/action_scanFragment_to_lectureDetailFragment"
-            app:destination="@id/lectureTabFragment"
-            app:popUpTo="@id/scanFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
+        tools:layout="@layout/scan_fragment" />
     <fragment
         android:id="@+id/tabFragment"
-        android:name="com.example.attendance.ui.tabcontainer.LecturesModulesTabFragment"
+        android:name="com.example.attendance.ui.tabcontainer.LecturesModulesContainerFragment"
         android:label="tab_fragment"
         tools:layout="@layout/lectures_modules_tab_fragment" >
         <action
-            android:id="@+id/action_tabFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-        <action
             android:id="@+id/action_tabFragment_to_moduleDetailFragment"
-            app:destination="@id/moduleDetailFragment" />
+            app:destination="@id/moduleTabFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
         <action
             android:id="@+id/action_tabFragment_to_createLectureFragment"
-            app:destination="@id/createLectureFragment" />
+            app:destination="@id/createLectureFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
         <action
             android:id="@+id/action_tabFragment_to_lectureTabFragment"
-            app:destination="@id/lectureTabFragment" />
+            app:destination="@id/lectureTabFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+        <action
+            android:id="@+id/action_tabFragment_to_studentFragment2"
+            app:destination="@id/studentFragment2"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
-    <fragment
-        android:id="@+id/moduleDetailFragment"
-        android:name="com.example.attendance.ui.tabcontainer.module.ModuleDetailFragment"
-        android:label="module_detail_fragment"
-        tools:layout="@layout/module_detail_fragment" />
     <fragment
         android:id="@+id/createLectureFragment"
         android:name="com.example.attendance.ui.tabcontainer.lecture.CreateLectureFragment"
@@ -60,10 +73,55 @@
         tools:layout="@layout/fragment_create_lecture" />
     <fragment
         android:id="@+id/lectureTabFragment"
-        android:name="com.example.attendance.ui.tabcontainer.lecture.LectureDetail.LectureTabFragment"
+        android:name="com.example.attendance.ui.tabcontainer.lecture.lecturedetail.LectureContainerFragment"
         android:label="LectureTabFragment" >
         <action
             android:id="@+id/action_lectureTabFragment_to_scanFragment"
-            app:destination="@id/scanFragment" />
+            app:destination="@id/scanFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+        <action
+            android:id="@+id/action_lectureTabFragment_to_studentFragment2"
+            app:destination="@id/studentFragment2"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
+    <fragment
+        android:id="@+id/moduleTabFragment"
+        android:name="com.example.attendance.ui.tabcontainer.module.moduledetail.ModuleContainerFragment"
+        android:label="ModuleTabFragment" >
+        <action
+            android:id="@+id/action_moduleTabFragment_to_lectureTabFragment"
+            app:destination="@id/lectureTabFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+        <action
+            android:id="@+id/action_moduleTabFragment_to_studentFragment2"
+            app:destination="@id/studentFragment2"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+    <fragment
+        android:id="@+id/studentFragment2"
+        android:name="com.example.attendance.ui.tabcontainer.student.StudentFragment"
+        android:label="fragment_student"
+        tools:layout="@layout/fragment_student" />
+    <action
+        android:id="@+id/action_global_loginFragment"
+        app:destination="@id/loginFragment"
+        app:enterAnim="@anim/slide_in_right"
+        app:exitAnim="@anim/slide_out_left"
+        app:launchSingleTop="false"
+        app:popEnterAnim="@anim/slide_in_left"
+        app:popExitAnim="@anim/slide_out_right"
+        app:popUpTo="@id/nav_graph"
+        app:popUpToInclusive="true" />
 </navigation>

@@ -26,6 +26,14 @@ public class ModuleModel {
 	@Expose
 	private boolean active;
 
+	@SerializedName("info")
+	@Expose
+	private String info;
+
+	@SerializedName("weight")
+	@Expose
+	private int credits;
+
 	@SerializedName("students")
 	@Expose
 	private UserModel[] students;
@@ -42,6 +50,42 @@ public class ModuleModel {
 		this.active = active;
 		this.students = students;
 		this.professors = professors;
+	}
+
+	public ModuleModel(int id, String title, String moduleCode, Date academicYearStart, String info,  int credits, boolean active, UserModel[] students, UserModel[] professors) {
+		this.id = id;
+		this.title = title;
+		this.moduleCode = moduleCode;
+		this.academicYearStart = academicYearStart;
+		this.info = info;
+		this.credits = credits;
+		this.active = active;
+		this.students = students;
+		this.professors = professors;
+	}
+
+	public int getCredits() {
+		return credits;
+	}
+
+	public void setCredits(int credits) {
+		this.credits = credits;
+	}
+
+	public Date getAcademicYearStart() {
+		return academicYearStart;
+	}
+
+	public void setAcademicYearStart(Date academicYearStart) {
+		this.academicYearStart = academicYearStart;
+	}
+
+	public String getInfo() {
+		return info;
+	}
+
+	public void setInfo(String info) {
+		this.info = info;
 	}
 
 	public int getId() {

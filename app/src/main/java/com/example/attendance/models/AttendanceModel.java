@@ -1,11 +1,12 @@
 package com.example.attendance.models;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
 
 public class AttendanceModel {
-	@SerializedName("lectureId")
+	@SerializedName("lecture")
 	private int lectureId;
 
 	@SerializedName("qrcode")
@@ -24,10 +25,22 @@ public class AttendanceModel {
 	private String error;
 
 	@SerializedName("present")
+	@Expose(serialize = false)
 	private boolean present;
+
+	@SerializedName("studentId")
+	@Expose(serialize = false)
+	private int studentId;
 
 	@SerializedName("student")
 	private UserModel student;
+
+	public AttendanceModel(int lectureId, String deviceId, int studentId, boolean present) {
+		this.lectureId = lectureId;
+		this.deviceId = deviceId;
+		this.studentId = studentId;
+		this.present = present;
+	}
 
 	public AttendanceModel(Date date, UserModel student, boolean present) {
 		this.date = date;

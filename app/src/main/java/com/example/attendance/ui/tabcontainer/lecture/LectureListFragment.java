@@ -20,61 +20,55 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.attendance.R;
-import com.example.attendance.auth.SessionManager;
-import com.example.attendance.models.LectureModel;
-import com.example.attendance.ui.tabcontainer.TabViewModel;
+import com.example.attendance.ui.tabcontainer.LectureRecyclerViewAdapter;
+import com.example.attendance.ui.tabcontainer.AppViewModel;
 import com.example.attendance.util.Constants;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class LectureListFragment extends Fragment {
 
     private static final String TAG = "LectureListFragment";
 
-    private TabViewModel viewModel;
+    private AppViewModel viewModel;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private TextView no_lectures_text_view;
-    private FloatingActionButton add_lecture_button;
 
-    final private LectureRecyclerViewAdapter adapter = new LectureRecyclerViewAdapter();
+    final private LectureRecyclerViewAdapter adapter = new LectureRecyclerViewAdapter(false, true, true, true);
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.lecture_list_fragment, container, false);
 
+        findViews(v);
+        setupViews(v);
 
+        return v;
+    }
+
+    public void findViews(View v){
+        no_lectures_text_view = v.findViewById(R.id.no_lectures_text_view);
+        swipeRefreshLayout = v.findViewById(R.id.pull_to_refresh_lectures);
+        recyclerView = v.findViewById(R.id.recycler_view_lecture_list);
+    }
+
+    public void setupViews(View v){
         //Set the onclick adapter to each recycler view item
         adapter.setOnItemClickListener(lectureModel -> {
             Toast.makeText(getContext(), "Lecture ID: " +  lectureModel.getId(), Toast.LENGTH_SHORT).show();
-
-            viewModel.setLecture(lectureModel.getId());
             Navigation.findNavController(v).navigate(R.id.action_tabFragment_to_lectureTabFragment);
+            viewModel.setLecture(lectureModel.getId());
         });
 
-        swipeRefreshLayout = v.findViewById(R.id.pull_to_refresh_lectures);
+        //Get lectures for today when user refreshes
         swipeRefreshLayout.setOnRefreshListener(() -> {
             viewModel.getLecturesForToday();
-            Log.d(TAG, "onCreateView: Refresh Listened!!");
         });
 
-        recyclerView = v.findViewById(R.id.recycler_view_lecture_list);
+        //Setup recyclerview
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        no_lectures_text_view = v.findViewById(R.id.no_lectures_text_view);
-
         recyclerView.setAdapter(adapter);
-
-        if (SessionManager.isAuthenticated() && SessionManager.getUser().isLecturer()){
-            add_lecture_button = v.findViewById(R.id.create_lecture_button);
-            add_lecture_button.setVisibility(View.VISIBLE);
-            add_lecture_button.setOnClickListener(view -> {
-                Navigation.findNavController(view).navigate(R.id.action_tabFragment_to_createLectureFragment);
-            });
-        }
-
-        return v;
     }
 
     @Override
@@ -82,7 +76,7 @@ public class LectureListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated: called");
 
-        viewModel = new ViewModelProvider(requireActivity()).get(TabViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(AppViewModel.class);
         subscribeObserver();
     }
 
@@ -108,6 +102,7 @@ public class LectureListFragment extends Fragment {
             //Stop the refresh animation
             Log.d(TAG, "refreshLectures: Stop refresh animation");
             swipeRefreshLayout.setRefreshing(false);
+            recyclerView.setVisibility(View.VISIBLE);
         });
     }
 
@@ -115,6 +110,10 @@ public class LectureListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         swipeRefreshLayout.setRefreshing(true);
+        recyclerView.setVisibility(View.INVISIBLE);
+        viewModel.clearLectures();
+        viewModel.clearLecturesForModule();
         viewModel.getLecturesForToday();
     }
+
 }

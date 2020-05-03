@@ -10,6 +10,7 @@ import com.example.attendance.models.CreateLectureModel;
 import com.example.attendance.models.DeleteLectureModel;
 import com.example.attendance.models.LectureModel;
 import com.example.attendance.models.ModuleModel;
+import com.example.attendance.models.UserModel;
 import com.example.attendance.network.WebServiceProvider;
 import com.google.zxing.WriterException;
 
@@ -26,6 +27,7 @@ import androidmads.library.qrgenearator.QRGEncoder;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.LiveDataReactiveStreams;
 import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
@@ -33,20 +35,25 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class TabViewModel extends ViewModel {
+public class AppViewModel extends ViewModel {
 	private static final String TAG = "TabViewModel";
 
 	private int selectedLectureId = -1;
 	private int selectedModuleId = -1;
+	private int selectedStudentId = -1;
 	private MediatorLiveData<List<LectureModel>> lectureList = new MediatorLiveData<>();
 	private MediatorLiveData<LectureModel> lecture = new MediatorLiveData<>();
 	private MediatorLiveData<ModuleModel> module = new MediatorLiveData<>();
+	private MediatorLiveData<UserModel> student = new MediatorLiveData<>();
 	private MediatorLiveData<AttendanceModel> attendance = new MediatorLiveData<>();
 	private MediatorLiveData<List<ModuleModel>> moduleList = new MediatorLiveData<>();
 	private MediatorLiveData<LectureModel> creatingLecture = new MediatorLiveData<>();
 	private MediatorLiveData<LectureModel> deletingLecture = new MediatorLiveData<>();
 	private MediatorLiveData<Bitmap> qrCodeGenerator = new MediatorLiveData<>();
 	private MediatorLiveData<List<AttendanceModel>> lectureAttendance = new MediatorLiveData<>();
+	private MediatorLiveData<List<LectureModel>> lecturesForModule = new MediatorLiveData<>();
+	private MediatorLiveData<List<UserModel>> studentsForModule = new MediatorLiveData<>();
+	private MediatorLiveData<List<LectureModel>> studentLectureAttendanceForModule = new MediatorLiveData<>();
 	private Disposable poolingDisposable = null;
 
 	public void getLecturesForToday(){
@@ -96,32 +103,46 @@ public class TabViewModel extends ViewModel {
 	}
 
 	public void setLecture(int id){
-		if (lectureList.getValue() == null){
-			//TODO Deal with null lecture list
-			//This will involve making a call to fetch the data
-			Log.d(TAG, "setLecture: lecturelist is null");
-			return;
-		} else if (id < 0) {
+		if (lectureList.getValue() != null){
+			for (LectureModel l: lectureList.getValue()) {
+				Log.d(TAG, "setLecture: trying lectureList");
+				if (l.getId() == id){
+					lecture.postValue(l);
+					selectedLectureId = id;
+					setModule(l.getModuleId());
+					Log.d(TAG, "setLecture: id:"+id);
+					return;
+				}
+			}
+		}
+		if (lecturesForModule.getValue() != null){
+			for (LectureModel l: lecturesForModule.getValue()) {
+				Log.d(TAG, "setLecture: trying lectureList");
+				if (l.getId() == id){
+					lecture.postValue(l);
+					selectedLectureId = id;
+					setModule(l.getModuleId());
+					Log.d(TAG, "setLecture: id:"+id);
+					return;
+				}
+			}
+		}
+		else if (id < 0) {
 			lecture = null;
 		}
-
-		for (LectureModel l: lectureList.getValue()) {
-			if (l.getId() == id){
-				lecture.postValue(l);
-				selectedLectureId = id;
-				Log.d(TAG, "setLecture: id:"+id);
-				return;
-			}
+		else {
+			Log.d(TAG, "setLecture: No lectures");
 		}
 	}
 
 	public void setModule(int id){
+		Log.d(TAG, "setModule: id:" + id);
 		if (moduleList.getValue() == null){
 			//TODO Deal with null module list...
 			Log.d(TAG, "setModule: Module list is null");
 			return;
 		} else if (id < 0){
-			module = null;
+			module.setValue(null);
 		}
 
 		//Find correct module to set
@@ -135,7 +156,40 @@ public class TabViewModel extends ViewModel {
 		}
 	}
 
-	public LiveData<ModuleModel> getModule(){
+	public void setStudent(int id){
+		Log.d(TAG, "setStudent: id:" + id);
+		if (id < 0){
+			student.setValue(null);
+			return;
+		}
+
+		if (lectureAttendance.getValue() != null){
+			//Find correct student to set
+			for (AttendanceModel m: lectureAttendance.getValue()) {
+				if (m.getStudent().getId() == id){
+					student.setValue(m.getStudent());
+					selectedStudentId = id;
+					Log.d(TAG, "setStudent: Selected from lectureAttendance: " + selectedStudentId);
+					return;
+				}
+			}
+		}
+		if (studentsForModule.getValue() != null){
+			for (UserModel s: studentsForModule.getValue()) {
+				if (s.getId() == id){
+					student.setValue(s);
+					selectedStudentId = id;
+					Log.d(TAG, "setStudent: Selected from studentsForModule: " + selectedStudentId);
+					return;
+				}
+			}
+		}
+		student.setValue(null);
+		Log.d(TAG, "setStudent: Student not found");
+		Log.d(TAG, "setStudent: Selected: " + selectedStudentId);
+	}
+
+	public LiveData<ModuleModel> observeModule(){
 		setModule(selectedModuleId);
 		return module;
 	}
@@ -191,10 +245,14 @@ public class TabViewModel extends ViewModel {
 					AttendanceModel error;
 
 					Log.d(TAG, "postAttendance: Throwable: " + throwable.getClass().getCanonicalName());
+					Log.d(TAG, "postAttendance: Throwable " + throwable.toString());
+					Log.d(TAG, "postAttendance: Throwable " + throwable.getMessage());
 					if (throwable.getMessage().contains("409")){
-						error = new AttendanceModel(-1, null, null, "Already signed in", true);
+						error = new AttendanceModel(-1, null, null, "Device Already Used", true);
 					} else if (throwable.getMessage().contains("406")) {
-						error = new AttendanceModel(-1, null, null, "Device already used", true);
+						error = new AttendanceModel(-1, null, null, "Invalid QR Code", true);
+					} else if (throwable.getMessage().contains("403")) {
+							error = new AttendanceModel(-1, null, null, "No access to this lecture", true);
 					} else {
 						error = new AttendanceModel(-1, null, null, "Something went wrong", true);
 					}
@@ -218,9 +276,16 @@ public class TabViewModel extends ViewModel {
 		if (lectureList.getValue() != null){
 			lectureList.getValue().clear();
 		}
+		if (lecturesForModule.getValue() != null){
+			lecturesForModule.getValue().clear();
+		}
+		if (moduleList.getValue() != null){
+			moduleList.getValue().clear();
+		}
 		lecture.setValue(null);
-		moduleList.setValue(null);
 		attendance.setValue(null);
+
+		Log.d(TAG, "clearAll: Cleared");
 	}
 
 	@Override
@@ -357,7 +422,7 @@ public class TabViewModel extends ViewModel {
 
 					Log.d(TAG, "getAttendedStudentsForCurrentLecture: Throwable: " + throwable.getClass().getCanonicalName());
 					Log.d(TAG, "getAttendedStudentsForCurrentLecture: Throwable: " + throwable.getMessage());
-					lectureList.postValue(null);
+					lectureAttendance.postValue(null);
 					return error;
 				})
 				.doOnNext(attendanceModels -> {
@@ -370,5 +435,128 @@ public class TabViewModel extends ViewModel {
 
 	public LiveData<List<AttendanceModel>> observeAttendanceForLecture() {
 		return lectureAttendance;
+	}
+
+	public LiveData<List<LectureModel>> observeLecturesForModule() {
+		return lecturesForModule;
+	}
+
+	public LiveData<List<UserModel>> observeStudentsForModule() {
+		return studentsForModule;
+	}
+
+
+	public void getLecturesForModule() {
+		WebServiceProvider.getLectureApi().getLecturesForModule(SessionManager.getUser().getToken(true), selectedModuleId)
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribeOn(Schedulers.io())
+				.doOnSubscribe(action -> {
+					Log.d(TAG, "getLecturesForModule: Subscribed!");
+				})
+				.doOnComplete(() -> {
+					Log.d(TAG, "getLecturesForModule: Complete!");
+				})
+				.doOnError(action ->{
+					Log.d(TAG, "getLecturesForModule: Error!");
+				})
+				.onErrorReturn(throwable -> {
+					List<LectureModel> error = new ArrayList<>();
+
+					Log.d(TAG, "getLecturesForModule: Throwable: " + throwable.getClass().getCanonicalName());
+					Log.d(TAG, "getLecturesForModule: Throwable: " + throwable.getMessage());
+					lecturesForModule.postValue(null);
+					return error;
+				})
+				.doOnNext(lectureModels -> {
+					Log.d(TAG, "getLecturesForModule: " + lectureModels.toString());
+					//lectureList.postValue(lectureModels);
+					lecturesForModule.postValue(lectureModels);
+				})
+				.subscribe();
+	}
+
+	public void getStudentsForModule() {
+		WebServiceProvider.getModuleApi().getStudentsForModule(SessionManager.getUser().getToken(true), selectedModuleId)
+				.subscribeOn(Schedulers.io())
+				.doOnSubscribe(action -> {
+					Log.d(TAG, "getStudentsForModule: Subscribed!");
+				})
+				.doOnComplete(() -> {
+					Log.d(TAG, "getStudentsForModule: Complete!");
+				})
+				.doOnError(action ->{
+					Log.d(TAG, "getStudentsForModule: Error!");
+				})
+				.onErrorReturn(throwable -> {
+					List<UserModel> error = new ArrayList<>();
+
+					Log.d(TAG, "getStudentsForModule: Throwable: " + throwable.getClass().getCanonicalName());
+					Log.d(TAG, "getStudentsForModule: Throwable: " + throwable.getMessage());
+					studentsForModule.postValue(null);
+					return error;
+				})
+				.doOnNext(userModels -> {
+					Log.d(TAG, "getStudentsForModule: " + userModels.toString());
+					studentsForModule.postValue(userModels);
+				})
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe();
+	}
+
+	public LiveData<List<LectureModel>> observeStudentLectureAttendanceForModule() {
+		return studentLectureAttendanceForModule;
+	}
+
+	public void getStudentLectureAttendanceForModule() {
+		WebServiceProvider
+				.getLectureApi()
+				.getLecturesForModuleWithStudentsAttendance(SessionManager.getUser().getToken(true), selectedModuleId, selectedStudentId)
+				.subscribeOn(Schedulers.io())
+				.doOnSubscribe(action -> {
+					Log.d(TAG, "getAttendedStudentsForCurrentLecture: Subscribed!");
+				})
+				.doOnComplete(() -> {
+					Log.d(TAG, "getAttendedStudentsForCurrentLecture: Complete!");
+				})
+				.doOnError(action ->{
+					Log.d(TAG, "getAttendedStudentsForCurrentLecture: Error!");
+				})
+				.onErrorReturn(throwable -> {
+					List<LectureModel> error = new ArrayList<>();
+
+					Log.d(TAG, "getAttendedStudentsForCurrentLecture: Throwable: " + throwable.getClass().getCanonicalName());
+					Log.d(TAG, "getAttendedStudentsForCurrentLecture: Throwable: " + throwable.getMessage());
+					studentLectureAttendanceForModule.postValue(null);
+					return error;
+				})
+				.doOnNext(lectureModels -> {
+					studentLectureAttendanceForModule.postValue(lectureModels);
+				})
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe();
+	}
+
+	public LiveData<UserModel> observerStudent(){
+		return student;
+	}
+
+	public void clearAttendance() {
+		attendance.setValue(null);
+	}
+
+	public void clearLectures() {
+		if (lectureList.getValue() != null){
+			lectureList.getValue().clear();
+		}
+	}
+
+	public void clearLecturesForModule() {
+		if (lecturesForModule.getValue() != null){
+			lecturesForModule.getValue().clear();
+		}
+	}
+
+	public void setCurrentLecture(LectureModel currentLecture) {
+		lecture.setValue(currentLecture);
 	}
 }

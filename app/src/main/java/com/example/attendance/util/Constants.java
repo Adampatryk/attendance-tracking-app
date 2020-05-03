@@ -3,7 +3,7 @@ package com.example.attendance.util;
 import android.os.Build;
 
 public class Constants {
-    public static final String BASE_URL = "https://9da2b614.ngrok.io";
+    public static final String BASE_URL = "https://19a88e47.ngrok.io";
 
     public static final int TIMESTAMP_VALID_FOR = 3;
 

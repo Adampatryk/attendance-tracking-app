@@ -1,6 +1,5 @@
-package com.example.attendance.ui.tabcontainer.lecture.LectureDetail;
+package com.example.attendance.ui.tabcontainer.lecture.lecturedetail;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,8 +8,8 @@ import android.view.ViewGroup;
 import com.example.attendance.R;
 import com.example.attendance.auth.SessionManager;
 import com.example.attendance.models.AttendanceModel;
-import com.example.attendance.models.LectureModel;
 import com.example.attendance.models.UserModel;
+import com.example.attendance.util.DateTimeConversion;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.text.SimpleDateFormat;
@@ -22,12 +21,14 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class StudentsAttendanceForLectureRecyclerViewAdapter extends ListAdapter<AttendanceModel, StudentsAttendanceForLectureRecyclerViewAdapter.StudentAttendanceHolder> {
+public class StudentAttendanceForLectureRecyclerViewAdapter extends ListAdapter<AttendanceModel, StudentAttendanceForLectureRecyclerViewAdapter.StudentAttendanceHolder> {
 
-	private StudentsAttendanceForLectureRecyclerViewAdapter.OnItemClickListener listener;
+	private StudentAttendanceForLectureRecyclerViewAdapter.OnItemClickListener listener;
 	private static final String TAG = "StudentAttAdapter";
+	private int colorPresent;
+	private int colorAbsent;
 
-	public StudentsAttendanceForLectureRecyclerViewAdapter() {
+	public StudentAttendanceForLectureRecyclerViewAdapter() {
 		super(DIFF_CALLBACK);
 	}
 
@@ -49,32 +50,35 @@ public class StudentsAttendanceForLectureRecyclerViewAdapter extends ListAdapter
 
 	@NonNull
 	@Override
-	public StudentsAttendanceForLectureRecyclerViewAdapter.StudentAttendanceHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+	public StudentAttendanceForLectureRecyclerViewAdapter.StudentAttendanceHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 		View itemView = LayoutInflater.from(parent.getContext())
-				.inflate(R.layout.student_attended_recycler_view_item, parent, false);
-		return new StudentsAttendanceForLectureRecyclerViewAdapter.StudentAttendanceHolder(itemView);
+				.inflate(R.layout.student_recycler_view_item, parent, false);
+
+		colorPresent = itemView.getContext().getResources().getColor(R.color.colorPresent);
+		colorAbsent = itemView.getContext().getResources().getColor(R.color.colorAbsent);
+
+		return new StudentAttendanceForLectureRecyclerViewAdapter.StudentAttendanceHolder(itemView);
 	}
 
 	@Override
-	public void onBindViewHolder(@NonNull StudentsAttendanceForLectureRecyclerViewAdapter.StudentAttendanceHolder holder, int position) {
+	public void onBindViewHolder(@NonNull StudentAttendanceForLectureRecyclerViewAdapter.StudentAttendanceHolder holder, int position) {
 		//Get the current lecture item
 		AttendanceModel currentAttendanceModel = getItem(position);
 
 		//If the attendance model states that the user is present, colour in green, otherwise red
 		if (currentAttendanceModel.isPresent()) {
-			holder.itemView.setBackgroundColor(Color.rgb(1, 50, 32));
+			holder.itemView.setBackgroundColor(colorPresent);
 		} else {
-			holder.itemView.setBackgroundColor(Color.rgb(50, 8, 1));
+			holder.itemView.setBackgroundColor(colorAbsent);
 		}
 
-		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
 
 		Date date = currentAttendanceModel.getDate();
 
 		String time = "";
 		//Check if date is null for records that are not yet scanned present
 		if (date != null){
-			time = formatter.format(date);
+			time = DateTimeConversion.getTimeFromDate(date);
 		} else {
 			time = "N/A";
 		}
@@ -102,7 +106,18 @@ public class StudentsAttendanceForLectureRecyclerViewAdapter extends ListAdapter
 		public StudentAttendanceHolder(@NonNull View itemView) {
 			super(itemView);
 			txt_view_student_name = itemView.findViewById(R.id.item_lbl_student_name);
-			txt_view_time = itemView.findViewById(R.id.item_student_time);
+			txt_view_time = itemView.findViewById(R.id.item_student_info);
+
+			//Only let lecturers find attendance for other students
+			if (SessionManager.isAuthenticated() && SessionManager.getUser().isLecturer()) {
+				itemView.setOnClickListener(v -> {
+					int position = getAdapterPosition();
+					//Make sure the listener is implemented, and that the click is on a valid position
+					if (listener != null && position != RecyclerView.NO_POSITION) {
+						listener.onItemClick(getItem(position));
+					}
+				});
+			}
 		}
 	}
 
@@ -110,7 +125,7 @@ public class StudentsAttendanceForLectureRecyclerViewAdapter extends ListAdapter
 		void onItemClick(AttendanceModel attendanceModel);
 	}
 
-	public void setOnItemClickListener(StudentsAttendanceForLectureRecyclerViewAdapter.OnItemClickListener listener) {
+	public void setOnItemClickListener(StudentAttendanceForLectureRecyclerViewAdapter.OnItemClickListener listener) {
 		this.listener = listener;
 	}
 }

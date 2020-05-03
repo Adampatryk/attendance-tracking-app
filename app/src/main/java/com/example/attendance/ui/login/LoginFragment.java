@@ -1,5 +1,6 @@
 package com.example.attendance.ui.login;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -22,8 +23,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.example.attendance.R;
 import com.example.attendance.auth.SessionManager;
@@ -40,7 +43,7 @@ public class LoginFragment extends Fragment {
     private static final String TAG = "LoginFragment";
 
     private LoginViewModel viewModel;
-    private MaterialButton btn_login;
+    private Button btn_login;
     private TextInputLayout username_field, password_field;
     private ProgressBar progressBar;
 
@@ -76,8 +79,6 @@ public class LoginFragment extends Fragment {
             Toast.makeText(getContext(), "Already logged in", Toast.LENGTH_SHORT).show();
             Navigation.findNavController(getView()).navigate(R.id.action_loginFragment_to_lectureListFragment);
         }
-
-        // TODO: Use the ViewModel
     }
 
     private boolean attemptLogin(){

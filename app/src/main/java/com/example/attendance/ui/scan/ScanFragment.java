@@ -1,7 +1,6 @@
 package com.example.attendance.ui.scan;
 
 import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
@@ -21,31 +20,31 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.attendance.R;
-import com.example.attendance.auth.QrCodeGenerator;
 import com.example.attendance.models.AttendanceModel;
-import com.example.attendance.ui.tabcontainer.TabViewModel;
+import com.example.attendance.models.LectureModel;
+import com.example.attendance.ui.tabcontainer.AppViewModel;
 import com.example.attendance.util.Constants;
 import com.example.attendance.util.DateTimeConversion;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 
 public class ScanFragment extends Fragment {
 	private static final String TAG = "ScanFragment";
-	private TabViewModel viewModel;
+	private AppViewModel viewModel;
 	private BarcodeDetector barcodeDetector;
 	private CameraSource cameraSource;
 	private SurfaceView surfaceView;
 	private Handler barcodeHandler;
 	SurfaceHolder.Callback cameraCallback;
-
+	private ProgressBar scanLoading;
 	private int lecture_id;
 
 	@Override
@@ -53,8 +52,18 @@ public class ScanFragment extends Fragment {
 							 @Nullable Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.scan_fragment, container, false);
 
-		surfaceView = v.findViewById(R.id.surface_scan);
+		findViews(v);
+		setupViews(v);
 
+		return v;
+	}
+
+	public void findViews(View v){
+		surfaceView = v.findViewById(R.id.surface_scan);
+		scanLoading = v.findViewById(R.id.scan_loading);
+	}
+
+	public void setupViews(View v){
 		barcodeDetector = new BarcodeDetector.Builder(getContext())
 				.setBarcodeFormats(Barcode.QR_CODE).build();
 
@@ -91,6 +100,9 @@ public class ScanFragment extends Fragment {
 		};
 
 		surfaceView.getHolder().addCallback(cameraCallback);
+
+		//Prevents the user from taking a screenshot or recording screen
+		// (had to turn off for dissertation write up)
 		surfaceView.setSecure(true);
 
 		barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
@@ -113,14 +125,6 @@ public class ScanFragment extends Fragment {
 		});
 
 		barcodeHandler = new Handler();
-		viewModel = new ViewModelProvider(requireActivity()).get(TabViewModel.class);
-
-		//Make sure the secret and lecture_id is up to date
-		viewModel.observeLecture().observeForever(lectureModel -> {
-			lecture_id = lectureModel.getId();
-		});
-
-		return v;
 	}
 
 	private void setupServerResponse(){
@@ -129,19 +133,28 @@ public class ScanFragment extends Fragment {
 			if (attendanceModel != null){
 				Log.d(TAG, "setupServerResponse: " + attendanceModel.toString());
 				if (attendanceModel.getLectureId() == -1){
-					Toast.makeText(getContext(), "Error: " + attendanceModel.getError(), Toast.LENGTH_SHORT).show();
+					Toast.makeText(getContext(), "Error: " + attendanceModel.getError() + "\nCheck lecture and try again.", Toast.LENGTH_LONG).show();
 				} else {
 					//Server accepted
-					Toast.makeText(getContext(), "Accepted!: " + attendanceModel.toString(), Toast.LENGTH_SHORT).show();
+					Toast.makeText(getContext(), "You have been signed in! ", Toast.LENGTH_SHORT).show();
 					Log.d(TAG, "setupServerResponse: Accepted!: " + attendanceModel.toString());
+					LectureModel currentLecture = viewModel.observeLecture().getValue();
+					if (currentLecture!= null){
+						currentLecture.setPresent(1);
+						viewModel.setCurrentLecture(currentLecture);
+					} else {
+						Log.d(TAG, "setupServerResponse: Current lecture is null");
+					}
 				}
 				Log.d(TAG, "setupServerResponse: Lecture model: " + viewModel.observeAttendance().getValue());
-				getActivity().onBackPressed();
+				viewModel.getLecturesForModule();
+				Navigation.findNavController(getView()).popBackStack();
 			} else{
-				Toast.makeText(getContext(), "response was null", Toast.LENGTH_LONG).show();
-				Log.d(TAG, "setupServerResponse: response was null");
+				Log.d(TAG, "setupServerResponse: something went wrong - response was null");
 			}
-			viewModel.observeAttendance().removeObservers(getViewLifecycleOwner());
+			//Stop progress bar
+			scanLoading.setVisibility(View.INVISIBLE);
+
 		});
 	}
 
@@ -152,56 +165,37 @@ public class ScanFragment extends Fragment {
 		AttendanceModel attendance = new AttendanceModel(lecture_id, barcode.displayValue, Constants.DEVICE_ID, qrTimestamp);
 
 
+		if (getView() == null) {
+			return false;
+		}
+
 		//Ask the server if this is a valid code
-		setupServerResponse();
 		viewModel.postAttendance(attendance);
 
 		//Stop the camera
 		cameraSource.stop();
 
-		//TODO: Show dialogue box with refresh
-
-//		//Does the scanned QR code match what it should be based on the secret
-//		boolean match = QrCodeGenerator.generateCodeFromSecret(secret).equals(barcode.displayValue);
-//
-//		//If it matches, tell the server and update viewmodel, otherwise tell the user the QR code is invalid
-//		if (match) {
-//			AttendanceModel attendance = new AttendanceModel(lecture_id, secret, Constants.DEVICE_ID, null, false);
-//
-//			//What to do when the server responds after scanning QR code
-//			viewModel.observeAttendance().observe(getViewLifecycleOwner(), attendanceModel -> {
-//				if (attendanceModel != null){
-//
-//					if (attendanceModel.getLectureId() == -1){
-//						Toast.makeText(getContext(), "Error: " + attendanceModel.getError(), Toast.LENGTH_SHORT).show();
-//					} else {
-//						//Server accepted
-//						Toast.makeText(getContext(), "Accepted!: " + attendanceModel.toString(), Toast.LENGTH_SHORT).show();
-//						Log.d(TAG, "onCreateView: Accepted!: " + attendanceModel.toString());
-//					}
-//					Log.d(TAG, "onActivityCreated: Lecture model: " + viewModel.observeAttendance().getValue());
-//					getActivity().onBackPressed();
-//				} else {
-//					Log.d(TAG, "onCreateView: Response was null");
-//				}
-//				viewModel.observeAttendance().removeObservers(getViewLifecycleOwner());
-//
-//				Log.d(TAG, "OnResult: lecture observers? " + viewModel.observeAttendance().hasObservers());
-//			});
-//			viewModel.postAttendance(attendance);
-//
-//			cameraSource.stop();
-//
-//			Log.d(TAG, "handleBarcode: Posting attendance..." + attendance.toString());
-//		}
-//		return match;
+		//Start progress bar animation
+		scanLoading.setVisibility(View.VISIBLE);
 		return true;
 	}
 
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		viewModel = new ViewModelProvider(requireActivity()).get(AppViewModel.class);
 
+		setupServerResponse();
+
+		//Make sure the secret and lecture_id is up to date
+		viewModel.observeLecture().observe(getViewLifecycleOwner(), lectureModel -> {
+			if (lectureModel != null) {
+				lecture_id = lectureModel.getId();
+			} else {
+				lecture_id = -1;
+				viewModel.getLecture();
+			}
+		});
 	}
 
 	private boolean startCamera(SurfaceHolder surfaceHolder){
@@ -233,7 +227,7 @@ public class ScanFragment extends Fragment {
 					Toast.makeText(getContext(),
 							"You must enable the camera permission to scan yourself in",
 							Toast.LENGTH_SHORT).show();
-					Navigation.findNavController(getView()).navigate(R.id.action_scanFragment_to_lectureDetailFragment);
+					Navigation.findNavController(getView()).popBackStack();
 				}
 			}
 		}
@@ -244,7 +238,6 @@ public class ScanFragment extends Fragment {
 		super.onDestroyView();
 		Log.d(TAG, "onDestroyView: Cleaning up");
 		cameraSource.release();
-		viewModel.observeAttendance().removeObservers(getViewLifecycleOwner());
-		viewModel.observeLecture().removeObservers(getViewLifecycleOwner());
+		viewModel.clearAttendance();
 	}
 }

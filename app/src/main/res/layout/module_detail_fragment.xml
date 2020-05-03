@@ -5,93 +5,106 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    tools:context=".ui.tabcontainer.module.ModuleDetailFragment">
+    tools:context=".ui.tabcontainer.module.moduledetail.ModuleDetailFragment">
 
-    <TextView
-        android:id="@+id/module_title"
+    <ScrollView
+        android:id="@+id/lectureScrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:gravity="center_horizontal"
-        android:textSize="30sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Example Title" />
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="16dp">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/module_code_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Module Code"
-        android:textColor="@color/colorAccent"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toTopOf="@id/module_code"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/module_title" />
+            <TextView
+                android:id="@+id/module_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_marginTop="38dp"
+                android:gravity="center_horizontal"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="40dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/academic_year"
+                tools:text="Computer Security" />
 
-    <TextView
-        android:id="@+id/module_code"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
-        android:textSize="25sp"
-        app:layout_constraintBottom_toTopOf="@id/academic_year_label"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/module_code_label"
-        tools:text="G53 FIV" />
+            <TextView
+                android:id="@+id/module_code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textColor="@color/colorAccent"
+                android:textSize="20dp"
+                app:layout_constraintTop_toBottomOf="@id/module_title"
+                tools:text="G53 FIV" />
 
-    <TextView
-        android:id="@+id/academic_year_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/colorAccent"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toTopOf="@id/academic_year"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/module_code"
-        android:text="Academic Year" />
+            <TextView
+                android:id="@+id/academic_year"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textSize="13sp"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="2019/20" />
 
-    <TextView
-        android:id="@+id/academic_year"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
-        android:textSize="25sp"
-        app:layout_constraintBottom_toTopOf="@id/teachers_label"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/academic_year_label"
-        tools:text="Academic Year" />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/lbl_module_lecturer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="40dp"
+                android:text="Taught by"
+                android:textSize="16dp"
+                app:layout_constraintTop_toBottomOf="@+id/module_credits"/>
 
-    <TextView
-        android:id="@+id/teachers_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Taught By"
-        android:textColor="@color/colorAccent"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toTopOf="@id/teachers"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/academic_year" />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/module_lecturer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="25dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lbl_module_lecturer"
+                tools:text="Prof. Steven Bagley" />
 
-    <TextView
-        android:id="@+id/teachers"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
-        android:textSize="25sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/teachers_label"
-        tools:text="Dr. Adam" />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/module_credits"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="30dp"
+                android:gravity="center_horizontal"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="30dp"
+                app:layout_constraintTop_toBottomOf="@+id/module_code"
+                tools:layout_editor_absoluteX="30dp"
+                tools:text="40 Credits" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/lbl_module_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="40dp"
+                android:text="Info"
+                app:layout_constraintTop_toBottomOf="@id/module_lecturer" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/module_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="18dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lbl_module_info"
+                tools:text="LT2 Guest Lecturer" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,10 +1,11 @@
-package com.example.attendance.ui.tabcontainer.lecture.LectureDetail;
+package com.example.attendance.ui.tabcontainer.lecture.lecturedetail;
 
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -17,19 +18,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.attendance.R;
-import com.example.attendance.ui.tabcontainer.TabViewModel;
+import com.example.attendance.auth.SessionManager;
+import com.example.attendance.ui.tabcontainer.AppViewModel;
 import com.example.attendance.util.Constants;
 
 public class LectureStudentsFragment extends Fragment {
 
 	private static final String TAG = "LectureStudentsFragment";
 
-	private TabViewModel viewModel;
+	private AppViewModel viewModel;
 	private SwipeRefreshLayout refreshStudentsAttendedLayout;
 	private TextView no_students_assigned_text_view;
 	private RecyclerView studentsAttendanceRecyclerView;
 
-	final private StudentsAttendanceForLectureRecyclerViewAdapter adapter = new StudentsAttendanceForLectureRecyclerViewAdapter();
+	final private StudentAttendanceForLectureRecyclerViewAdapter adapter = new StudentAttendanceForLectureRecyclerViewAdapter();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -43,7 +45,7 @@ public class LectureStudentsFragment extends Fragment {
 		View v = inflater.inflate(R.layout.fragment_lecture_students, container, false);
 
 		findViews(v);
-		setupViews();
+		setupViews(v);
 
 
 		return v;
@@ -52,7 +54,7 @@ public class LectureStudentsFragment extends Fragment {
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		viewModel = new ViewModelProvider(requireActivity()).get(TabViewModel.class);
+		viewModel = new ViewModelProvider(requireActivity()).get(AppViewModel.class);
 		subscribeObserver();
 	}
 
@@ -62,14 +64,29 @@ public class LectureStudentsFragment extends Fragment {
 		studentsAttendanceRecyclerView = v.findViewById(R.id.recycler_view_students_attended_list);
 	}
 
-	public void setupViews(){
+	public void setupViews(View v){
 		//Set up on refresh listener for swipe refresh layout
 		refreshStudentsAttendedLayout.setOnRefreshListener(() -> {
-			Log.d(TAG, "subscribeObserver: Refreshing attendance for lecture");
+			Log.d(TAG, "setupViews: Refreshing attendance for lecture");
 			viewModel.getAttendedStudentsForCurrentLecture();
 		});
 
 		//Setup recycler view and its adapter
+
+		//Only let lecturers find attendance for other students
+		if (SessionManager.isAuthenticated() && SessionManager.getUser().isLecturer()) {
+			adapter.setOnItemClickListener(attendanceModel -> {
+				viewModel.setStudent(attendanceModel.getStudent().getId());
+				if (viewModel.observerStudent().getValue() == null) {
+					Toast.makeText(getContext(), "Student not found", Toast.LENGTH_SHORT).show();
+				} else if (viewModel.observeModule().getValue() == null) {
+					Toast.makeText(getContext(), "Module not found", Toast.LENGTH_SHORT).show();
+				} else {
+					Navigation.findNavController(v).navigate(R.id.action_lectureTabFragment_to_studentFragment2);
+				}
+			});
+		}
+
 		studentsAttendanceRecyclerView.setHasFixedSize(true);
 		studentsAttendanceRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -98,13 +115,16 @@ public class LectureStudentsFragment extends Fragment {
 			//Stop the refresh animation
 			Log.d(TAG, "subscribeObserver: Stop refresh animation");
 			refreshStudentsAttendedLayout.setRefreshing(false);
+			studentsAttendanceRecyclerView.setVisibility(View.VISIBLE);
 		});
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
+		studentsAttendanceRecyclerView.setVisibility(View.INVISIBLE);
 		refreshStudentsAttendedLayout.setRefreshing(true);
 		viewModel.getAttendedStudentsForCurrentLecture();
 	}
+
 }

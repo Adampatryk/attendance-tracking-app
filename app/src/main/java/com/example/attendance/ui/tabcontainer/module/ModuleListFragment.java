@@ -20,12 +20,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.attendance.R;
-import com.example.attendance.ui.tabcontainer.TabViewModel;
+import com.example.attendance.ui.tabcontainer.AppViewModel;
 import com.example.attendance.util.Constants;
 
 public class ModuleListFragment extends Fragment {
 
-	private TabViewModel viewModel;
+	private AppViewModel viewModel;
 	private RecyclerView recyclerView;
 	private SwipeRefreshLayout swipeRefreshLayout;
 	private TextView no_modules_text_view;
@@ -68,7 +68,7 @@ public class ModuleListFragment extends Fragment {
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		viewModel = new ViewModelProvider(requireActivity()).get(TabViewModel.class);
+		viewModel = new ViewModelProvider(requireActivity()).get(AppViewModel.class);
 		subscribeObservers();
 		viewModel.getModules();
 		swipeRefreshLayout.setRefreshing(true);
@@ -92,7 +92,15 @@ public class ModuleListFragment extends Fragment {
 			}
 			//Stop the refresh animation
 			swipeRefreshLayout.setRefreshing(false);
+			recyclerView.setVisibility(View.VISIBLE);
 		});
 	}
-	
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		recyclerView.setVisibility(View.INVISIBLE);
+		swipeRefreshLayout.setRefreshing(true);
+		viewModel.getModules();
+	}
 }
