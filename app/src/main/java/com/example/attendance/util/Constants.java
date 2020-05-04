@@ -5,11 +5,7 @@ import android.os.Build;
 public class Constants {
     public static final String BASE_URL = "https://19a88e47.ngrok.io";
 
-    public static final int TIMESTAMP_VALID_FOR = 3;
-
-    public static final String NETWORK_ERROR_MSG = "Couldn't reach the server";
-
-    public static final String DEVICE_ID = "35" + //we make this look like a valid IMEI
+    public static final String DEVICE_ID = "" +
             Build.BOARD.length()%10+ Build.BRAND.length()%10 +
             Build.CPU_ABI.length()%10 + Build.DEVICE.length()%10 +
             Build.DISPLAY.length()%10 + Build.HOST.length()%10 +
@@ -19,4 +15,6 @@ public class Constants {
             Build.USER.length()%10;
 
     public static final int PERMISSIONS_REQUEST_CAMERA = 0;
+    public static final String NETWORK_ERROR_MSG = "Couldn't reach the server";
+    public static final int TIMESTAMP_VALID_FOR = 3;
 }
